@@ -6,6 +6,8 @@ import (
 	"restaurant-management/internal/service"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v2/persist"
 	"github.com/gin-gonic/gin"
 )
 
@@ -47,6 +49,10 @@ func GetAuthorizationHeader(c *gin.Context) string {
 	return authHeader
 }
 
+func Authentication(authSrv service.AuthService) JWT {
+	return &authMiddleWare{authSrv: authSrv}
+}
+
 func isBrowser(userAgent string) bool {
 	switch {
 	case strings.Contains(userAgent, "Mozilla"), strings.Contains(userAgent, "Chrome"), strings.Contains(userAgent, "Postman"), strings.Contains(userAgent, "Edge"), strings.Contains(userAgent, "Trident"):
@@ -56,6 +62,21 @@ func isBrowser(userAgent string) bool {
 	}
 }
 
-func Authentication(authSrv service.AuthService) JWT {
-	return &authMiddleWare{authSrv: authSrv}
+func enforce(sub string, obj string, act string, adapter persist.Adapter) (bool, error) {
+	enforcer, err := casbin.NewEnforcer("../rbac_model.conf", adapter)
+	if err != nil {
+		return false, err
+	}
+
+	err = enforcer.LoadPolicy()
+	if err != nil {
+		return false, fmt.Errorf("failed to load policy from DB: %w", err)
+	}
+
+	ok, err := enforcer.Enforce(sub, obj, act)
+	if err != nil {
+		return false, err
+	}
+
+	return ok, nil
 }
