@@ -96,10 +96,10 @@ func (u *userHandler) Login(c *gin.Context) {
 // @Failure	500  {object}  se.ServiceError
 // @Router	/users/{userId} [get]
 func (u *userHandler) Get(c *gin.Context) {
-	if c.GetString("role") != "ADMIN" && c.GetString("userId") != c.Param("userId") {
-		response.Error(c, *se.Forbidden("you are not authorized to view this resource"))
-		return
-	}
+	// if c.GetString("role") != "ADMIN" && c.GetString("userId") != c.Param("userId") {
+	// 	response.Error(c, *se.Forbidden("you are not authorized to view this resource"))
+	// 	return
+	// }
 
 	user, err := u.userSrv.Get(c.Param("userId"))
 	if err != nil {
@@ -122,10 +122,10 @@ func (u *userHandler) Get(c *gin.Context) {
 // @Failure	500  {object}  se.ServiceError
 // @Router	/users [get]
 func (u *userHandler) GetAll(c *gin.Context) {
-	if c.GetString("role") != "ADMIN" {
-		response.Error(c, *se.Forbidden("you are not authorized to view this resource"))
-		return
-	}
+	// if c.GetString("role") != "ADMIN" {
+	// 	response.Error(c, *se.Forbidden("you are not authorized to view this resource"))
+	// 	return
+	// }
 
 	users, err := u.userSrv.GetAll()
 	if err != nil {

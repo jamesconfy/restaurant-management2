@@ -1,1 +1,1 @@
-ALTER TABLE user DROP COLUMN role;
+ALTER TABLE users DROP COLUMN role;

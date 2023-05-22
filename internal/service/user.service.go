@@ -37,6 +37,10 @@ func (u *userSrv) Create(req *forms.Create) (*models.User, *se.ServiceError) {
 		return nil, se.ConflictOrInternal(err, "user already exists")
 	}
 
+	if ok, err := u.userRepo.PhoneExists(req.PhoneNumber); ok {
+		return nil, se.ConflictOrInternal(err, "phone already taken")
+	}
+
 	password, err := u.cryptoSrv.HashPassword(req.Password)
 	if err != nil {
 		return nil, se.Internal(err, "could not hash password")

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"restaurant-management/internal/service"
+	"restaurant-management/utils"
 	"strings"
 
-	"github.com/casbin/casbin/v2"
-	"github.com/casbin/casbin/v2/persist"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,8 +28,19 @@ func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
 
 		token, err := a.authSrv.Validate(authToken)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, fmt.Sprintf("Invalid Authorization Token: %v", err))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": fmt.Sprintf("Invalid Authorization Token: %v", err)})
 			return
+		}
+
+		fmt.Println("Request: ", c.Request.RequestURI)
+		ok, err := enforce(fmt.Sprintf("role::%v", strings.ToLower(token.Role)), c.Request.RequestURI, c.Request.Method)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Error when enforcing role base action: %v", err)})
+			return
+		}
+
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized, you are not allowed to view this resource"})
 		}
 
 		c.Set("userId", token.Id)
@@ -62,18 +72,17 @@ func isBrowser(userAgent string) bool {
 	}
 }
 
-func enforce(sub string, obj string, act string, adapter persist.Adapter) (bool, error) {
-	enforcer, err := casbin.NewEnforcer("../rbac_model.conf", adapter)
-	if err != nil {
-		return false, err
-	}
+func enforce(sub string, obj string, act string) (bool, error) {
+	utils.Enforcer.AddGroupingPolicy("sample-user01", "user::role")
+	utils.Enforcer.AddPolicy("sample-user02", "sample-path1", "GET", "allow")
+	utils.Enforcer.SavePolicy()
 
-	err = enforcer.LoadPolicy()
+	err := utils.Enforcer.LoadPolicy()
 	if err != nil {
 		return false, fmt.Errorf("failed to load policy from DB: %w", err)
 	}
 
-	ok, err := enforcer.Enforce(sub, obj, act)
+	ok, err := utils.Enforcer.Enforce(sub, obj, act)
 	if err != nil {
 		return false, err
 	}

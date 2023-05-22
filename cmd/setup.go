@@ -16,7 +16,6 @@ import (
 	service "restaurant-management/internal/service"
 	utils "restaurant-management/utils"
 
-	"github.com/casbin/casbin/v2"
 	gin "github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -41,12 +40,6 @@ func Setup() {
 	v1.Use(gin.Logger())
 	v1.Use(gin.Recovery())
 	router.Use(middleware.CORS())
-
-	e, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
-	if err != nil {
-		log.Println("Cashbin: ", err)
-	}
-	e.Enforce()
 
 	db, err := sql.New(dsn)
 	if err != nil {

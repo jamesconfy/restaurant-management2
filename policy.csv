@@ -1,73 +1,10 @@
-p, role::admin, *, (GET)|(POST)|(PUT)|(DELETE), allow
-p, role::user, /api/v1/users*, GET, deny
-p, role::user, /api/v1/
-p, role::anonymous, /v1/webhook*, (GET)|(POST)|(PUT)|(DELETE), allow
-p, role::admin, /v1/*, (GET)|(POST)|(PUT)|(DELETE), allow
-p, role::admin, /v1/tax*, (GET)|(POST)|(PUT)|(DELETE), deny
-p, role::admin, /v1/roles*, (GET)|(POST)|(PUT)|(DELETE), deny
-p, (role::anonymous)|(role::user)|(role::admin), /v1/auth/*, (GET)|(POST), allow
-p, role::anonymous, /v1/drivers/, POST, allow
-p, role::anonymous, /v1/routes, (GET)|(POST), allow
-p, role::anonymous, /v1/auth/change-password, (GET)|(POST), deny
-p, role::anonymous, /v1/auth/logout, GET, deny
-p, role::anonymous, /v1/auth/verify, (GET)|(POST), deny
-p, (role::anonymous)|(role::user)|(role::driver)|(role::admin), /v1/users, POST, allow
-p, (role::user)|(role::driver), /v1/users, GET, deny
-p, (role::user), /v1/users/profile, (GET), allow
-p, role::user, /v1/trips/available-slots*, GET, allow
+p, role::admin, *, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, role::user, /api/v1/users, (GET)|(POST)|(PATCH)|(DELETE), deny
+p, role::user, /api/v1/auth/logout, POST, allow
+p, role::user, /api/v1/auth/clear, POST, allow
+p, role::user, /api/v1/users/profile, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, 0911, /api/v1/users/0911, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, sample-user01, sample-path, GET, allow
+p, sample-user02, sample-path1, GET, allow
 
-g, 01GZ7QGA8VMF868M1QC46T2BX9, role::user
-g, 01GZ8DAZYS3VSMZR34Q5TY7D1D, role::superadmin
-g, 01GZF1GWW8GEH1E1MA7YJ36BED, role::user
-g, 01GZF4E0VP1W21AS8GXH9XT13M, role::user
-g, 01GZF4EE8062DQQEHSPT9MSQY6, role::user
-g, 01GZGBD5EV56W7G4HZ64CT8GN7, role::user
-g, 01GZR9C6Q02Y0TFM9V8QKT036J, role::user
-g, 01GZRA5QBK66VPJNXRSXPVY85E, role::user
-g, 01GZRACHMKJHP0RXHQFSZA57KQ, role::user
-g, 01GZSRWG4NW3V09V96RJ8K3SYJ, role::user
-g, 01H0WMW2W0JRJ2TE7NQQVVAJE3, role::user
-g, 01H0WMY8F98KAPXBPHA3R483HM, role::user
-g, 01H0WMZWMD2D46R6MB4H2BXBWM, role::user
-g, 01H0WNSG218P8RB9NZ2G643P3N, role::user
-g, 01H0WP58QW316EMKXG3VPMTSGX, role::user
-g, 01H0WP5XGZZADWBKVNMK6A2NYW, role::user
-g, 01H0WPP8W5THTB4CDMBSWQZV1R, role::user
-g, 01H0WPQG0BT4X9CK252EB0GXNH, role::user
-g, 01H0WVAT2160XAWBS59ZKYEV8X, role::user
-g, 01H0WVMQBPWCSHJ6S5XRS8JJK4, role::user
-g, 01H0WVS6Q9CG3F82VPD0AV37ZM, role::user
-g, 01H0WVVNVT6KAZMQGB5JBKQXYB, role::user
-g, 01H0WVY42NBFWPNW9CG39WCEQP, role::user
-g, 01H0WW1NA6G8V3PGFHJPA8M3M1, role::user
-g, 01H0WW7BJKJXS6A8TD5TZAYM41, role::user
-g, 01H0WWB18AXPGZM1Z0YG5FTRWP, role::user
-g, 01H0WWEF9QHDKVMSG93XKD6AA6, role::user
-g, 01H0WWFWY1C3T9HR554H616Y6V, role::user
-g, 01H0WWHFPKM92X317PJ4QF5MZD, role::user
-g, 01H0WWJDDY9BGG5314XEQZHYYN, role::user
-g, 01H0WWNK9Q9ZFAN17XYKHW22KQ, role::user
-g, 01H0WWP8871R84MH4ZHFN8EPC2, role::user
-g, 01H0WWRCG5V2NPEZC2Y7C09339, role::user
-g, 01H0WWS5A62WKS0DMYY9ZJ8GT7, role::user
-g, 01H0WWSNMY1JQH24E5A2BDHBBA, role::user
-g, 01H0WWV8F1MQGNQ9AY140KR8XQ, role::user
-g, 01H0WWVN18THPRENN88YTBSX70, role::user
-g, 01H0WWW0MZTVJX23GQ8Z34MJGW, role::user
-g, 01H0WX8EM99WZZ8HFYKHJC7FC6, role::user
-g, 01H0WX8Q1VQHKJEGHKG5WX4KS1, role::user
-g, 01H0WXCQNDXPHCR3GXAR5YZ0KH, role::user
-g, 01H0WXECJGADG9ZEZC5BMP27JA, role::user
-g, 01H0WXKC40WE010GAF3A46JPCT, role::user
-g, 01H0WXKYTRK2775FCQHTS2ZDMZ, role::user
-g, 01H0WZ5HA2DK4SGRBJ2BY6Z96B, role::user
-g, 01H0WZCGA1316KRHVXS8MDZQXF, role::user
-g, 01H0WZP900N4BW7NXFKR3DWGHY, role::user
-g, 01H0WZSW6XZD0CYCT3FRGA1DBV, role::user
-g, 01H0WZT73181H87AQ6STV02N76, role::user
-
-g, 09111, role::user
-g, xb991, role::user
-g, xp39234929, 09111
-p, (role::user)|(role::admin), /v1/api/bookings*, (GET)|(POST)|(DELETE)|(PUT), deny
-p, 09111, /v1/api/bookings/xp39234929, GET, allow
+g, sample-user01, user::role

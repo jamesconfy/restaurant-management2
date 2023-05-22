@@ -87,7 +87,7 @@ func (t *authSrv) Validate(url string) (*Token, error) {
 		return nil, fmt.Errorf("expired token, please login again || expired time: %s", claims.ExpiresAt.Time)
 	}
 
-	row, err := t.authRepo.Get(claims.Id)
+	_, err = t.authRepo.Get(claims.Id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("outdated token")
@@ -95,9 +95,9 @@ func (t *authSrv) Validate(url string) (*Token, error) {
 		return nil, err
 	}
 
-	if row.ExpiresAt.Before(time.Now().Local()) {
-		return nil, fmt.Errorf("token is expired")
-	}
+	// if row.ExpiresAt.Before(time.Now().Local()) {
+	// 	return nil, fmt.Errorf("token is expired")
+	// }
 
 	return claims, err
 }
