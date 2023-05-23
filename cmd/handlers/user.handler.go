@@ -5,6 +5,7 @@ import (
 	"restaurant-management/internal/response"
 	"restaurant-management/internal/se"
 	"restaurant-management/internal/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,6 +43,10 @@ func (u *userHandler) Create(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, *se.Validating(err))
 		return
+	}
+
+	if strings.Contains(c.Request.RequestURI, "admin") {
+		req.Role = "ADMIN"
 	}
 
 	user, err := u.userSrv.Create(&req)

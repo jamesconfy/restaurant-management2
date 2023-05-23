@@ -1,10 +1,13 @@
 package service
 
 import (
+	"fmt"
 	"restaurant-management/internal/forms"
 	"restaurant-management/internal/models"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/se"
+	"restaurant-management/utils"
+	"strings"
 
 	"github.com/docker/distribution/uuid"
 )
@@ -59,6 +62,14 @@ func (u *userSrv) Create(req *forms.Create) (*models.User, *se.ServiceError) {
 	if err != nil {
 		return nil, se.Internal(err)
 	}
+
+	defer func() {
+		obj := fmt.Sprintf("/api/v1/users/%v", usr.Id)
+		utils.Enforcer.AddPolicy(usr.Id, obj, "(GET)|(POST)|(DELETE)|(PATCH)|(PUT)", "allow")
+		utils.Enforcer.AddGroupingPolicy(usr.Id, fmt.Sprintf("role::%v", strings.ToLower(usr.Role)))
+
+		utils.Enforcer.SavePolicy()
+	}()
 
 	return usr, nil
 }

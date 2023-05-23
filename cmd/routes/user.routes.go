@@ -27,6 +27,7 @@ func UserRoute(router *gin.RouterGroup, userSrv service.UserService, authSrv ser
 
 	auth2.Use(middleware.CheckJWT())
 	{
+		auth2.POST("/register/admin", handler.Create)
 		auth2.POST("/logout", handler.Logout)
 		auth2.DELETE("/clear", handler.ClearAuth)
 	}

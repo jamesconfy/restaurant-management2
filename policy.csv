@@ -1,10 +1,13 @@
-p, role::admin, *, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, role::admin, /api/v1*, (GET)|(POST)|(PATCH)|(DELETE), allow
 p, role::user, /api/v1/users, (GET)|(POST)|(PATCH)|(DELETE), deny
 p, role::user, /api/v1/auth/logout, POST, allow
 p, role::user, /api/v1/auth/clear, POST, allow
 p, role::user, /api/v1/users/profile, (GET)|(POST)|(PATCH)|(DELETE), allow
-p, 0911, /api/v1/users/0911, (GET)|(POST)|(PATCH)|(DELETE), allow
-p, sample-user01, sample-path, GET, allow
-p, sample-user02, sample-path1, GET, allow
+p, 8a0f55e7-8108-453f-898f-a0719b650c83, /api/v1/users/8a0f55e7-8108-453f-898f-a0719b650c83, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
+p, 716deb0d-f1d6-49bc-9487-e6bdcf2f3d10, /api/v1/users/716deb0d-f1d6-49bc-9487-e6bdcf2f3d10, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
 
-g, sample-user01, user::role
+g, 87d76e9f-d68f-4aac-b26b-f95d247a0ed3, role::user
+g, 6e93c258-5125-47d4-b02d-c613d3024589, role::user
+g, 0d6daed2-e2f8-45d2-8bf4-3f1cc9e2f796, role::admin
+g, 8a0f55e7-8108-453f-898f-a0719b650c83, role::user
+g, 716deb0d-f1d6-49bc-9487-e6bdcf2f3d10, role::admin

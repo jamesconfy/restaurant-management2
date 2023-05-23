@@ -20,7 +20,7 @@ type authMiddleWare struct {
 
 func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authToken := GetAuthorizationHeader(c)
+		authToken := a.getAuthorizationHeader(c)
 		if authToken == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid Authorization Token: Token cannot be empty"})
 			return
@@ -32,16 +32,7 @@ func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Request: ", c.Request.RequestURI)
-		ok, err := enforce(fmt.Sprintf("role::%v", strings.ToLower(token.Role)), c.Request.RequestURI, c.Request.Method)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Error when enforcing role base action: %v", err)})
-			return
-		}
-
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized, you are not allowed to view this resource"})
-		}
+		a.checkPolicy(c, token)
 
 		c.Set("userId", token.Id)
 		c.Set("role", token.Role)
@@ -49,8 +40,13 @@ func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
 	}
 }
 
-func GetAuthorizationHeader(c *gin.Context) string {
-	if isBrowser(c.Request.UserAgent()) {
+func Authentication(authSrv service.AuthService) JWT {
+	return &authMiddleWare{authSrv: authSrv}
+}
+
+// Auxillary Function
+func (a *authMiddleWare) getAuthorizationHeader(c *gin.Context) string {
+	if a.isBrowser(c.Request.UserAgent()) {
 		authtoken, _ := c.Cookie("Authorization")
 		return authtoken
 	}
@@ -59,11 +55,7 @@ func GetAuthorizationHeader(c *gin.Context) string {
 	return authHeader
 }
 
-func Authentication(authSrv service.AuthService) JWT {
-	return &authMiddleWare{authSrv: authSrv}
-}
-
-func isBrowser(userAgent string) bool {
+func (a *authMiddleWare) isBrowser(userAgent string) bool {
 	switch {
 	case strings.Contains(userAgent, "Mozilla"), strings.Contains(userAgent, "Chrome"), strings.Contains(userAgent, "Postman"), strings.Contains(userAgent, "Edge"), strings.Contains(userAgent, "Trident"):
 		return true
@@ -72,11 +64,7 @@ func isBrowser(userAgent string) bool {
 	}
 }
 
-func enforce(sub string, obj string, act string) (bool, error) {
-	utils.Enforcer.AddGroupingPolicy("sample-user01", "user::role")
-	utils.Enforcer.AddPolicy("sample-user02", "sample-path1", "GET", "allow")
-	utils.Enforcer.SavePolicy()
-
+func (a *authMiddleWare) enforce(sub string, obj string, act string) (bool, error) {
 	err := utils.Enforcer.LoadPolicy()
 	if err != nil {
 		return false, fmt.Errorf("failed to load policy from DB: %w", err)
@@ -88,4 +76,17 @@ func enforce(sub string, obj string, act string) (bool, error) {
 	}
 
 	return ok, nil
+}
+
+func (a *authMiddleWare) checkPolicy(c *gin.Context, token *service.Token) {
+	ok, err := a.enforce(token.Id, c.Request.RequestURI, c.Request.Method)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Error when enforcing role base action: %v", err)})
+		return
+	}
+
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized, you are not allowed to view this resource"})
+		return
+	}
 }
