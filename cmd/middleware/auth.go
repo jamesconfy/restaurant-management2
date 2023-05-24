@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"restaurant-management/internal/service"
-	"restaurant-management/utils"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +16,7 @@ type JWT interface {
 
 type authMiddleWare struct {
 	authSrv service.AuthService
+	cashbin *casbin.Enforcer
 }
 
 func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
@@ -40,8 +41,8 @@ func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
 	}
 }
 
-func Authentication(authSrv service.AuthService) JWT {
-	return &authMiddleWare{authSrv: authSrv}
+func Authentication(authSrv service.AuthService, cashbin *casbin.Enforcer) JWT {
+	return &authMiddleWare{authSrv: authSrv, cashbin: cashbin}
 }
 
 // Auxillary Function
@@ -65,12 +66,12 @@ func (a *authMiddleWare) isBrowser(userAgent string) bool {
 }
 
 func (a *authMiddleWare) enforce(sub string, obj string, act string) (bool, error) {
-	err := utils.Enforcer.LoadPolicy()
+	err := a.cashbin.LoadPolicy()
 	if err != nil {
 		return false, fmt.Errorf("failed to load policy from DB: %w", err)
 	}
 
-	ok, err := utils.Enforcer.Enforce(sub, obj, act)
+	ok, err := a.cashbin.Enforce(sub, obj, act)
 	if err != nil {
 		return false, err
 	}
@@ -79,7 +80,7 @@ func (a *authMiddleWare) enforce(sub string, obj string, act string) (bool, erro
 }
 
 func (a *authMiddleWare) checkPolicy(c *gin.Context, token *service.Token) {
-	ok, err := a.enforce(token.Id, c.Request.RequestURI, c.Request.Method)
+	ok, err := a.enforce(token.Id, c.Request.URL.Path, c.Request.Method)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Error when enforcing role base action: %v", err)})
 		return

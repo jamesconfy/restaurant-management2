@@ -6,3 +6,5 @@ docker-compose.yml
 fly.toml
 __debug_bin
 .DS_Store
+model.conf
+policy.csv

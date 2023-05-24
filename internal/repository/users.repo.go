@@ -10,10 +10,12 @@ type UserRepo interface {
 	EmailExists(email string) (bool, error)
 	PhoneExists(phone_number string) (bool, error)
 
-	Add(req *models.User) (*models.User, error)
+	Add(user *models.User) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 	GetById(userId string) (*models.User, error)
 	GetAll() ([]*models.User, error)
+	Edit(userId string, user *models.User) (*models.User, error)
+	Delete(userId string) (err error)
 }
 
 type userSql struct {
@@ -60,8 +62,8 @@ func (u *userSql) PhoneExists(phone_number string) (bool, error) {
 	return true, nil
 }
 
-func (u *userSql) Add(req *models.User) (*models.User, error) {
-	return u.addUser(req)
+func (u *userSql) Add(user *models.User) (*models.User, error) {
+	return u.addUser(user)
 }
 
 func (u *userSql) GetByEmail(email string) (usr *models.User, err error) {
@@ -112,6 +114,30 @@ func (u *userSql) GetAll() ([]*models.User, error) {
 	}
 
 	return users, err
+}
+
+func (u *userSql) Edit(userId string, user *models.User) (usr *models.User, err error) {
+	usr = new(models.User)
+
+	query := `UPDATE users SET first_name = $1, last_name = $2, email = $3, phone_number = $4, date_updated = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id, first_name, last_name, email, phone_number, password, role, date_created, date_updated`
+
+	err = u.conn.QueryRow(query, user.FirstName, user.LastName, user.Email, user.PhoneNumber, userId).Scan(&usr.Id, &usr.FirstName, &usr.LastName, &usr.Email, &usr.PhoneNumber, &usr.Password, &usr.Role, &usr.DateCreated, &usr.DateUpdated)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (u *userSql) Delete(userId string) (err error) {
+	query := `DELETE FROM users WHERE id = $1`
+
+	_, err = u.conn.Exec(query, userId)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func NewUserRepo(conn *sql.DB) UserRepo {

@@ -45,6 +45,8 @@ func (u *userHandler) Create(c *gin.Context) {
 		return
 	}
 
+	req.Role = ""
+
 	if strings.Contains(c.Request.RequestURI, "admin") {
 		req.Role = "ADMIN"
 	}
@@ -84,7 +86,7 @@ func (u *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	setCookie(c, auth.AccessToken, 0)
+	u.setCookie(c, auth.AccessToken, 0)
 	response.Success(c, "user logged in successfully", auth)
 }
 
@@ -101,11 +103,6 @@ func (u *userHandler) Login(c *gin.Context) {
 // @Failure	500  {object}  se.ServiceError
 // @Router	/users/{userId} [get]
 func (u *userHandler) Get(c *gin.Context) {
-	// if c.GetString("role") != "ADMIN" && c.GetString("userId") != c.Param("userId") {
-	// 	response.Error(c, *se.Forbidden("you are not authorized to view this resource"))
-	// 	return
-	// }
-
 	user, err := u.userSrv.Get(c.Param("userId"))
 	if err != nil {
 		response.Error(c, *err)
@@ -127,11 +124,6 @@ func (u *userHandler) Get(c *gin.Context) {
 // @Failure	500  {object}  se.ServiceError
 // @Router	/users [get]
 func (u *userHandler) GetAll(c *gin.Context) {
-	// if c.GetString("role") != "ADMIN" {
-	// 	response.Error(c, *se.Forbidden("you are not authorized to view this resource"))
-	// 	return
-	// }
-
 	users, err := u.userSrv.GetAll()
 	if err != nil {
 		response.Error(c, *err)
@@ -153,13 +145,13 @@ func (u *userHandler) GetAll(c *gin.Context) {
 // @Router	/users/logout [post]
 // @Security ApiKeyAuth
 func (u *userHandler) Logout(c *gin.Context) {
-	err := u.userSrv.DeleteAuth(c.GetString("userId"), getAuth(c))
+	err := u.userSrv.DeleteAuth(c.GetString("userId"), u.getAuth(c))
 	if err != nil {
 		response.Error(c, *err)
 		return
 	}
 
-	setCookie(c, "", -1)
+	u.setCookie(c, "", -1)
 	response.Success201(c, "Logged out successfully", nil)
 }
 
@@ -175,7 +167,7 @@ func (u *userHandler) Logout(c *gin.Context) {
 // @Router	/users/profile/clear [post]
 // @Security ApiKeyAuth
 func (u *userHandler) ClearAuth(c *gin.Context) {
-	err := u.userSrv.ClearAuth(c.GetString("userId"), getAuth(c))
+	err := u.userSrv.ClearAuth(c.GetString("userId"), u.getAuth(c))
 	if err != nil {
 		response.Error(c, *err)
 		return
@@ -189,11 +181,11 @@ func NewUserHandler(userSrv service.UserService) UserHandler {
 }
 
 // Auxillary function
-func setCookie(c *gin.Context, value string, max_age int) {
+func (u *userHandler) setCookie(c *gin.Context, value string, max_age int) {
 	c.SetCookie(defaultCookieName, value, 0, "/", "", false, true)
 }
 
-func getAuth(c *gin.Context) (auth string) {
+func (u *userHandler) getAuth(c *gin.Context) (auth string) {
 	auth, _ = c.Cookie(defaultCookieName)
 
 	if auth != "" {

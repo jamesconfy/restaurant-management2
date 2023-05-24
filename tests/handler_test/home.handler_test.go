@@ -12,7 +12,7 @@ import (
 func TestHome(t *testing.T) {
 	r := setupApp()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/test", nil)
+	req, _ := http.NewRequest("GET", "/api/v1", nil)
 
 	r.ServeHTTP(w, req)
 

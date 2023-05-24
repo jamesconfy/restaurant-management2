@@ -16,6 +16,7 @@ import (
 	service "restaurant-management/internal/service"
 	utils "restaurant-management/utils"
 
+	"github.com/casbin/casbin/v2"
 	gin "github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -48,6 +49,11 @@ func Setup() {
 	defer db.Close()
 	conn := db.GetConn()
 
+	cashbin, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
+	if err != nil {
+		log.Println("Cashbin: ", err)
+	}
+
 	// Auth Repository
 	authRepo := repo.NewAuthRepo(conn)
 
@@ -70,11 +76,14 @@ func Setup() {
 	homeSrv := service.NewHomeService()
 
 	// User Service
-	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv)
+	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv, cashbin)
+
+	// Middleware
+	jwt := middleware.Authentication(authSrv, cashbin)
 
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
-	routes.UserRoute(v1, userSrv, authSrv)
+	routes.UserRoute(v1, userSrv, jwt)
 	routes.ErrorRoute(router)
 
 	// Documentation

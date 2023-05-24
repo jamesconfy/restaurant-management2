@@ -6,9 +6,9 @@ import (
 	"restaurant-management/internal/models"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/se"
-	"restaurant-management/utils"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/docker/distribution/uuid"
 )
 
@@ -28,6 +28,7 @@ type userSrv struct {
 	cryptoSrv    CryptoService
 	authSrv      AuthService
 	emailSrv     EmailService
+	cashbin      *casbin.Enforcer
 }
 
 func (u *userSrv) Create(req *forms.Create) (*models.User, *se.ServiceError) {
@@ -65,10 +66,10 @@ func (u *userSrv) Create(req *forms.Create) (*models.User, *se.ServiceError) {
 
 	defer func() {
 		obj := fmt.Sprintf("/api/v1/users/%v", usr.Id)
-		utils.Enforcer.AddPolicy(usr.Id, obj, "(GET)|(POST)|(DELETE)|(PATCH)|(PUT)", "allow")
-		utils.Enforcer.AddGroupingPolicy(usr.Id, fmt.Sprintf("role::%v", strings.ToLower(usr.Role)))
+		u.cashbin.AddPolicy(usr.Id, obj, "(GET)|(POST)|(DELETE)|(PATCH)|(PUT)", "allow")
+		u.cashbin.AddGroupingPolicy(usr.Id, fmt.Sprintf("role::%v", strings.ToLower(usr.Role)))
 
-		utils.Enforcer.SavePolicy()
+		u.cashbin.SavePolicy()
 	}()
 
 	return usr, nil
@@ -156,6 +157,6 @@ func (u *userSrv) ClearAuth(userId, accessToken string) *se.ServiceError {
 	return nil
 }
 
-func NewUserService(repo repo.UserRepo, authRepo repo.AuthRepo, validator ValidationService, cryptoSrv CryptoService, authSrv AuthService, emailSrv EmailService) UserService {
-	return &userSrv{userRepo: repo, authRepo: authRepo, validatorSrv: validator, cryptoSrv: cryptoSrv, authSrv: authSrv, emailSrv: emailSrv}
+func NewUserService(repo repo.UserRepo, authRepo repo.AuthRepo, validator ValidationService, cryptoSrv CryptoService, authSrv AuthService, emailSrv EmailService, cashbin *casbin.Enforcer) UserService {
+	return &userSrv{userRepo: repo, authRepo: authRepo, validatorSrv: validator, cryptoSrv: cryptoSrv, authSrv: authSrv, emailSrv: emailSrv, cashbin: cashbin}
 }
