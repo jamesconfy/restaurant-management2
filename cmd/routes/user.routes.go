@@ -16,6 +16,9 @@ func UserRoute(router *gin.RouterGroup, userSrv service.UserService, jwt middlew
 	{
 		user.GET("/:userId", handler.Get)
 		user.GET("", handler.GetAll)
+		user.GET("/profile", handler.GetProfile)
+		user.PATCH("/profile", handler.Edit)
+		user.DELETE("/profile", handler.Delete)
 	}
 
 	auth1, auth2 := router.Group("/auth"), router.Group("/auth")

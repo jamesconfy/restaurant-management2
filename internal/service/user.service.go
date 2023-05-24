@@ -13,10 +13,12 @@ import (
 )
 
 type UserService interface {
-	Create(req *forms.Create) (*models.User, *se.ServiceError)
+	Create(req *forms.User) (*models.User, *se.ServiceError)
 	Login(req *forms.Login) (*models.Auth, *se.ServiceError)
 	Get(userId string) (*models.User, *se.ServiceError)
 	GetAll() ([]*models.User, *se.ServiceError)
+	Edit(userId string, req *forms.EditUser) (*models.User, *se.ServiceError)
+	Delete(userId string) *se.ServiceError
 	DeleteAuth(userId, accessToken string) *se.ServiceError
 	ClearAuth(userId, accessToken string) *se.ServiceError
 }
@@ -31,7 +33,7 @@ type userSrv struct {
 	cashbin      *casbin.Enforcer
 }
 
-func (u *userSrv) Create(req *forms.Create) (*models.User, *se.ServiceError) {
+func (u *userSrv) Create(req *forms.User) (*models.User, *se.ServiceError) {
 	err := u.validatorSrv.Validate(req)
 	if err != nil {
 		return nil, se.Validating(err)
@@ -56,6 +58,8 @@ func (u *userSrv) Create(req *forms.Create) (*models.User, *se.ServiceError) {
 	user.FirstName = req.FirstName
 	user.LastName = req.LastName
 	user.PhoneNumber = req.PhoneNumber
+	user.Address = req.Address
+	user.Avatar = req.Avatar
 	user.Password = password
 	user.Role = req.Role
 
@@ -131,6 +135,39 @@ func (u *userSrv) GetAll() ([]*models.User, *se.ServiceError) {
 	return users, nil
 }
 
+func (u *userSrv) Edit(userId string, req *forms.EditUser) (*models.User, *se.ServiceError) {
+	user, err := u.userRepo.GetById(userId)
+	if err != nil {
+		return nil, se.NotFoundOrInternal(err, "user not found")
+	}
+
+	user, er := u.getEdit(req, user)
+	if er != nil {
+		return nil, er
+	}
+
+	user, err = u.userRepo.Edit(userId, user)
+	if err != nil {
+		return nil, se.Internal(err, "error when editing user")
+	}
+
+	return user, nil
+}
+
+func (u *userSrv) Delete(userId string) *se.ServiceError {
+	_, err := uuid.Parse(userId)
+	if err != nil {
+		return se.NotFound("user not found")
+	}
+
+	err = u.userRepo.Delete(userId)
+	if err != nil {
+		return se.NotFoundOrInternal(err, "user not found")
+	}
+
+	return nil
+}
+
 func (u *userSrv) DeleteAuth(userId, accessToken string) *se.ServiceError {
 	if _, er := uuid.Parse(userId); er != nil {
 		return se.NotFound("user not found")
@@ -159,4 +196,51 @@ func (u *userSrv) ClearAuth(userId, accessToken string) *se.ServiceError {
 
 func NewUserService(repo repo.UserRepo, authRepo repo.AuthRepo, validator ValidationService, cryptoSrv CryptoService, authSrv AuthService, emailSrv EmailService, cashbin *casbin.Enforcer) UserService {
 	return &userSrv{userRepo: repo, authRepo: authRepo, validatorSrv: validator, cryptoSrv: cryptoSrv, authSrv: authSrv, emailSrv: emailSrv, cashbin: cashbin}
+}
+
+// Auxillary Functions
+func (u *userSrv) getEdit(req *forms.EditUser, user *models.User) (*models.User, *se.ServiceError) {
+	if req.FirstName != user.FirstName && req.FirstName != "" {
+		user.FirstName = req.FirstName
+	}
+
+	if req.LastName != user.LastName && req.LastName != "" {
+		user.LastName = req.LastName
+	}
+
+	if req.Address != user.Address && req.Address != "" {
+		user.Address = req.Address
+	}
+
+	if req.Avatar != user.Avatar && req.Avatar != "" {
+		user.Avatar = req.Avatar
+	}
+
+	if req.Email != user.Email && req.Email != "" {
+		ok, err := u.userRepo.EmailExists(req.Email)
+		if ok {
+			return nil, se.Conflict("email already in use")
+		}
+
+		if err != nil {
+			return nil, se.Internal(err)
+		}
+
+		user.Email = req.Email
+	}
+
+	if req.PhoneNumber != user.PhoneNumber && req.PhoneNumber != "" {
+		ok, err := u.userRepo.PhoneExists(req.PhoneNumber)
+		if ok {
+			return nil, se.Conflict("phone already in use")
+		}
+
+		if err != nil {
+			return nil, se.Internal(err)
+		}
+
+		user.PhoneNumber = req.PhoneNumber
+	}
+
+	return user, nil
 }

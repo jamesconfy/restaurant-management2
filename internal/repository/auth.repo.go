@@ -25,7 +25,7 @@ func (a *authSql) Add(auth *models.Auth) (auh *models.Auth, err error) {
 
 	expires_at := utils.AppConfig.EXPIRES_AT
 	if expires_at != "" {
-		query := `INSERT INTO auth (user_id, access_token, refresh_token, expires_at) VALUES ($1, $2, $3, $4) RETURNING id, user_id, access_token, refresh_token, expires_at, date_created, date_updated`
+		query := `INSERT INTO auth(user_id, access_token, refresh_token, expires_at) VALUES ($1, $2, $3, $4) RETURNING id, user_id, access_token, refresh_token, expires_at, date_created, date_updated`
 
 		err = a.conn.QueryRow(query, auth.UserId, auth.AccessToken, auth.RefreshToken, a.getExpiry(expires_at)).Scan(&auh.Id, &auh.UserId, &auh.AccessToken, &auh.RefreshToken, &auh.ExpiresAt, &auh.DateCreated, &auh.DateUpdated)
 		if err != nil {
@@ -35,7 +35,7 @@ func (a *authSql) Add(auth *models.Auth) (auh *models.Auth, err error) {
 		return
 	}
 
-	query := `INSERT INTO auth (user_id, access_token, refresh_token) VALUES ($1, $2, $3) RETURNING id, user_id, access_token, refresh_token, expires_at, date_created, date_updated`
+	query := `INSERT INTO auth(user_id, access_token, refresh_token) VALUES ($1, $2, $3) RETURNING id, user_id, access_token, refresh_token, expires_at, date_created, date_updated`
 
 	err = a.conn.QueryRow(query, auth.UserId, auth.AccessToken, auth.RefreshToken).Scan(&auh.Id, &auh.UserId, &auh.AccessToken, &auh.RefreshToken, &auh.ExpiresAt, &auh.DateCreated, &auh.DateUpdated)
 	if err != nil {

@@ -14,7 +14,10 @@ type UserHandler interface {
 	Create(c *gin.Context)
 	Login(c *gin.Context)
 	Get(c *gin.Context)
+	GetProfile(c *gin.Context)
 	GetAll(c *gin.Context)
+	Edit(c *gin.Context)
+	Delete(c *gin.Context)
 	Logout(c *gin.Context)
 	ClearAuth(c *gin.Context)
 }
@@ -31,14 +34,14 @@ var defaultCookieName = "Authorization"
 // @Tags	Auth
 // @Accept	json
 // @Produce	json
-// @Param	request	body	forms.Create	true "Signup Details"
+// @Param	request	body	forms.User	true "Signup Details"
 // @Success	200  {object}  response.SuccessMessage{data=models.User}
 // @Failure	400  {object}  se.ServiceError
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
 // @Router	/auth/register [post]
 func (u *userHandler) Create(c *gin.Context) {
-	var req forms.Create
+	var req forms.User
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, *se.Validating(err))
@@ -102,8 +105,31 @@ func (u *userHandler) Login(c *gin.Context) {
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
 // @Router	/users/{userId} [get]
+// @Security ApiKeyAuth
 func (u *userHandler) Get(c *gin.Context) {
 	user, err := u.userSrv.Get(c.Param("userId"))
+	if err != nil {
+		response.Error(c, *err)
+		return
+	}
+
+	response.Success(c, "user gotten successfully", user)
+}
+
+// Get User Profile godoc
+// @Summary	Get user profile route
+// @Description	Get user profile
+// @Tags	Users
+// @Accept	json
+// @Produce	json
+// @Success	200  {object}  response.SuccessMessage{data=models.User}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/users/profile [get]
+// @Security ApiKeyAuth
+func (u *userHandler) GetProfile(c *gin.Context) {
+	user, err := u.userSrv.Get(c.GetString("userId"))
 	if err != nil {
 		response.Error(c, *err)
 		return
@@ -123,6 +149,7 @@ func (u *userHandler) Get(c *gin.Context) {
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
 // @Router	/users [get]
+// @Security ApiKeyAuth
 func (u *userHandler) GetAll(c *gin.Context) {
 	users, err := u.userSrv.GetAll()
 	if err != nil {
@@ -133,16 +160,67 @@ func (u *userHandler) GetAll(c *gin.Context) {
 	response.Success(c, "user gotten successfully", users, len(users))
 }
 
+// Edit User godoc
+// @Summary	Edit user route
+// @Description	Edit user in the system
+// @Tags	Users
+// @Accept	json
+// @Produce	json
+// @Param	request	body	forms.EditUser	true "Edit Details"
+// @Success	200  {object}  response.SuccessMessage{data=models.User}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/users/profile [patch]
+// @Security ApiKeyAuth
+func (u *userHandler) Edit(c *gin.Context) {
+	var req forms.EditUser
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, *se.Validating(err))
+		return
+	}
+
+	user, err := u.userSrv.Edit(c.GetString("userId"), &req)
+	if err != nil {
+		response.Error(c, *err)
+		return
+	}
+
+	response.Success(c, "User editted successfully", user)
+}
+
+// Delete User godoc
+// @Summary	Delete user route
+// @Description	Delete user
+// @Tags	Users
+// @Produce	json
+// @Success	200  {string}	string	"User deleted successfully"
+// @Failure	400  {object}  response.ErrorMessage
+// @Failure	404  {object}  response.ErrorMessage
+// @Failure	500  {object}  response.ErrorMessage
+// @Router	/users/profile [delete]
+// @Security ApiKeyAuth
+func (u *userHandler) Delete(c *gin.Context) {
+	err := u.userSrv.Delete(c.GetString("userId"))
+	if err != nil {
+		response.Error(c, *err)
+		return
+	}
+
+	response.Success202(c, "User deleted successfully")
+}
+
 // Logout User godoc
 // @Summary	Logout user route
 // @Description	Logout user
-// @Tags	User
+// @Tags	Auth
 // @Produce	json
 // @Success	200  {string}	string	"Logged out successfully"
 // @Failure	400  {object}  response.ErrorMessage
 // @Failure	404  {object}  response.ErrorMessage
 // @Failure	500  {object}  response.ErrorMessage
-// @Router	/users/logout [post]
+// @Router	/auth/logout [post]
 // @Security ApiKeyAuth
 func (u *userHandler) Logout(c *gin.Context) {
 	err := u.userSrv.DeleteAuth(c.GetString("userId"), u.getAuth(c))
@@ -158,13 +236,13 @@ func (u *userHandler) Logout(c *gin.Context) {
 // Clear Login Auth godoc
 // @Summary	Clear Login Auth route
 // @Description	Clear user auth
-// @Tags	User
+// @Tags	Auth
 // @Produce	json
 // @Success	200  {string}	string	"Logged out from all other device successfully"
 // @Failure	400  {object}  response.ErrorMessage
 // @Failure	404  {object}  response.ErrorMessage
 // @Failure	500  {object}  response.ErrorMessage
-// @Router	/users/profile/clear [post]
+// @Router	/auth/clear [delete]
 // @Security ApiKeyAuth
 func (u *userHandler) ClearAuth(c *gin.Context) {
 	err := u.userSrv.ClearAuth(c.GetString("userId"), u.getAuth(c))

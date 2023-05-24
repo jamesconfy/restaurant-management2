@@ -59,10 +59,12 @@ func TestCreateAdmin(t *testing.T) {
 
 	r.ServeHTTP(w, req)
 
-	_, err = io.ReadAll(w.Body)
+	resp, err := io.ReadAll(w.Body)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(string(resp))
 
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }

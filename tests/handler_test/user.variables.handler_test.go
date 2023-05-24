@@ -8,28 +8,32 @@ import (
 	"github.com/bxcodec/faker/v4"
 )
 
-func generateUserForm() *forms.Create {
-	return &forms.Create{
+func generateUserForm() *forms.User {
+	return &forms.User{
 		FirstName:   faker.FirstName(),
 		LastName:    faker.LastName(),
 		PhoneNumber: faker.Phonenumber(),
 		Email:       faker.Email(),
 		Password:    faker.Password(),
+		Address:     faker.MacAddress(),
+		Avatar:      faker.IPv4(),
 	}
 }
 
-func generateAdminForm() *forms.Create {
-	return &forms.Create{
+func generateAdminForm() *forms.User {
+	return &forms.User{
 		FirstName:   faker.FirstName(),
 		LastName:    faker.LastName(),
 		PhoneNumber: faker.Phonenumber(),
 		Email:       faker.Email(),
 		Password:    faker.Password(),
+		Address:     faker.MacAddress(),
+		Avatar:      faker.IPv4(),
 		Role:        "ADMIN",
 	}
 }
 
-func createAndRegisterUser(user *forms.Create) *models.User {
+func createAndRegisterUser(user *forms.User) *models.User {
 	if user == nil {
 		user = generateUserForm()
 	}
@@ -42,7 +46,7 @@ func createAndRegisterUser(user *forms.Create) *models.User {
 	return resultUser
 }
 
-func generateLoginForm(user *forms.Create) *forms.Login {
+func generateLoginForm(user *forms.User) *forms.Login {
 	if user == nil {
 		user = generateUserForm()
 
