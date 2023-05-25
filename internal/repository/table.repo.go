@@ -21,7 +21,7 @@ func (t *tableSql) Add(table *models.Table) (tabl *models.Table, err error) {
 
 	query := `INSERT INTO tables(seats) VALUES($1) RETURNING id, seats, number, booked, date_created, date_updated`
 
-	err = t.conn.QueryRow(query, table.Seats).Scan(&tabl.Id, &tabl.Seats, &tabl.Number, &tabl.DateCreated, &tabl.DateUpdated)
+	err = t.conn.QueryRow(query, table.Seats).Scan(&tabl.Id, &tabl.Seats, &tabl.Number, &tabl.Booked, &tabl.DateCreated, &tabl.DateUpdated)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (t *tableSql) Get(id string) (tabl *models.Table, err error) {
 
 	query := `SELECT id, seats, number, booked, date_created, date_updated FROM tables WHERE id = $1`
 
-	err = t.conn.QueryRow(query, id).Scan(&tabl.Id, &tabl.Seats, &tabl.Number, &tabl.DateCreated, &tabl.DateUpdated)
+	err = t.conn.QueryRow(query, id).Scan(&tabl.Id, &tabl.Seats, &tabl.Number, &tabl.Booked, &tabl.DateCreated, &tabl.DateUpdated)
 	if err != nil {
 		return
 	}
@@ -74,6 +74,10 @@ func (t *tableSql) Delete(id string) (err error) {
 
 	return
 }
+
+// func (t *tableSql) Book(book *models.Book) (tabl *models.Table, err error) {
+
+// }
 
 func NewTableRepo(conn *sql.DB) TableRepo {
 	return &tableSql{conn: conn}

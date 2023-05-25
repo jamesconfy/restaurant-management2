@@ -22,6 +22,7 @@ var (
 	db *sql.DB
 	u  repo.UserRepo
 	a  repo.AuthRepo
+	ta repo.TableRepo
 )
 
 func init() {
@@ -59,7 +60,6 @@ func init() {
 	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable", host, req.Env["POSTGRES_USER"], req.Env["POSTGRES_PASSWORD"], sqlPort["5432/tcp"][0].HostPort, req.Env["POSTGRES_DB"])
-	fmt.Println(dsn)
 
 	db, err = sql.Open("postgres", dsn)
 	if err != nil {
@@ -73,6 +73,7 @@ func init() {
 
 	u = repo.NewUserRepo(db)
 	a = repo.NewAuthRepo(db)
+	ta = repo.NewTableRepo(db)
 }
 
 func initDBSchema(db *sql.DB) error {
