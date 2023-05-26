@@ -21,9 +21,10 @@ import (
 
 var (
 	// Database
-	db       *sql.DB
-	userRepo repo.UserRepo
-	authRepo repo.AuthRepo
+	db        *sql.DB
+	userRepo  repo.UserRepo
+	tableRepo repo.TableRepo
+	authRepo  repo.AuthRepo
 
 	// Cashbin
 	cashbin *casbin.Enforcer
@@ -32,6 +33,7 @@ var (
 	emailSrv service.EmailService
 	authSrv  service.AuthService
 	userSrv  service.UserService
+	tableSrv service.TableService
 )
 
 func init() {
@@ -87,6 +89,7 @@ func init() {
 
 	userRepo = repo.NewUserRepo(db)
 	authRepo = repo.NewAuthRepo(db)
+	tableRepo = repo.NewTableRepo(db)
 
 	valiSrv := service.NewValidationService()
 	crySrv := service.NewCryptoService()
@@ -94,6 +97,7 @@ func init() {
 	authSrv = service.NewAuthService(authRepo, "")
 
 	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv, cashbin)
+	tableSrv = service.NewTableService(tableRepo, valiSrv, cashbin)
 }
 
 func initDBSchema(db *sql.DB) error {
