@@ -49,7 +49,7 @@ func TestGetTable(t *testing.T) {
 	}
 }
 
-func TestGetAllTable(t *testing.T) {
+func TestGetAllTable_Admin(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		_ = createAndAddTable(nil)
 	}
@@ -63,12 +63,29 @@ func TestGetAllTable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tables, err := ta.GetAll()
-
-			for _, table := range tables {
-				fmt.Println("Table: ", table)
+			_, err := ta.GetAll("ADMIN")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("tableSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
+		})
+	}
+}
 
+func TestGetAllTable_User(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		_ = createAndAddTable(nil)
+	}
+
+	tests := []struct {
+		name    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "Test with correct details", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ta.GetAll("USER")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)
 			}

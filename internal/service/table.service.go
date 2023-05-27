@@ -13,7 +13,7 @@ import (
 type TableService interface {
 	Add(req *forms.Table) (*models.Table, *se.ServiceError)
 	Get(tableId string) (*models.Table, *se.ServiceError)
-	GetAll() ([]*models.Table, *se.ServiceError)
+	GetAll(role string) ([]*models.Table, *se.ServiceError)
 	Delete(tableId string) *se.ServiceError
 }
 
@@ -55,8 +55,8 @@ func (ta *tableSrv) Get(tableId string) (*models.Table, *se.ServiceError) {
 	return tabl, nil
 }
 
-func (ta *tableSrv) GetAll() ([]*models.Table, *se.ServiceError) {
-	tables, err := ta.repo.GetAll()
+func (ta *tableSrv) GetAll(role string) ([]*models.Table, *se.ServiceError) {
+	tables, err := ta.repo.GetAll(role)
 	if err != nil {
 		return nil, se.Internal(err)
 	}

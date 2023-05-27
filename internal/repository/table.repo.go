@@ -8,7 +8,7 @@ import (
 type TableRepo interface {
 	Add(table *models.Table) (*models.Table, error)
 	Get(id string) (tabl *models.Table, err error)
-	GetAll() (tables []*models.Table, err error)
+	GetAll(role string) (tables []*models.Table, err error)
 	Delete(id string) (err error)
 }
 
@@ -42,8 +42,12 @@ func (t *tableSql) Get(id string) (tabl *models.Table, err error) {
 	return
 }
 
-func (t *tableSql) GetAll() (tables []*models.Table, err error) {
+func (t *tableSql) GetAll(role string) (tables []*models.Table, err error) {
 	query := `SELECT id, seats, number, booked, date_created, date_updated FROM tables`
+
+	if role == "USER" {
+		query = `SELECT id, seats, number, booked, date_created, date_updated FROM tables WHERE booked = false`
+	}
 
 	rows, err := t.conn.Query(query)
 	if err != nil {

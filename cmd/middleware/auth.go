@@ -87,7 +87,7 @@ func (a *authMiddleWare) checkPolicy(c *gin.Context, token *service.Token) {
 	}
 
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized, you are not allowed to view this resource"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "You are not authorized to edit this resource"})
 		return
 	}
 }

@@ -60,6 +60,9 @@ func Setup() {
 	// User Repository
 	userRepo := repo.NewUserRepo(conn)
 
+	// Table Repository
+	tableRepo := repo.NewTableRepo(conn)
+
 	// Email Service
 	emailSrv := service.NewEmailService(email, email_passwd, email_host, email_port)
 
@@ -78,12 +81,16 @@ func Setup() {
 	// User Service
 	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv, cashbin)
 
+	// Table Service
+	tableSrv := service.NewTableService(tableRepo, validatorSrv, cashbin)
+
 	// Middleware
 	jwt := middleware.Authentication(authSrv, cashbin)
 
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
 	routes.UserRoute(v1, userSrv, jwt)
+	routes.TableRoute(v1, tableSrv, jwt)
 	routes.ErrorRoute(router)
 
 	// Documentation

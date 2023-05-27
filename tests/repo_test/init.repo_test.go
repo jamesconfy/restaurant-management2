@@ -23,6 +23,8 @@ var (
 	u  repo.UserRepo
 	a  repo.AuthRepo
 	ta repo.TableRepo
+	f  repo.FoodRepo
+	m  repo.MenuRepo
 )
 
 func init() {
@@ -74,6 +76,8 @@ func init() {
 	u = repo.NewUserRepo(db)
 	a = repo.NewAuthRepo(db)
 	ta = repo.NewTableRepo(db)
+	f = repo.NewFoodRepo(db)
+	m = repo.NewMenuRepo(db)
 }
 
 func initDBSchema(db *sql.DB) error {
