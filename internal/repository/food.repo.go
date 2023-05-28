@@ -9,7 +9,7 @@ type FoodRepo interface {
 	Add(food *models.Food) (foo *models.Food, err error)
 	Get(foodId string) (foo *models.Food, err error)
 	GetAll() (foods []*models.Food, err error)
-	Edit(food *models.Food) (foo *models.Food, err error)
+	Edit(foodId string, food *models.Food) (foo *models.Food, err error)
 }
 
 type foodRepo struct {
@@ -64,12 +64,12 @@ func (f *foodRepo) GetAll() (foods []*models.Food, err error) {
 	return
 }
 
-func (f *foodRepo) Edit(food *models.Food) (foo *models.Food, err error) {
+func (f *foodRepo) Edit(foodId string, food *models.Food) (foo *models.Food, err error) {
 	foo = new(models.Food)
 
-	query := `UPDATE food SET name = $1, price = $2, image = $3, menu_id = $4 RETURNING id, name, price, image, menu_id, date_created, date_updated`
+	query := `UPDATE food SET name = $1, price = $2, image = $3, menu_id = $4 WHERE id = $5 RETURNING id, name, price, image, menu_id, date_created, date_updated`
 
-	err = f.conn.QueryRow(query, food.Name, food.Price, food.Image, food.MenuId).Scan(&foo.Id, &foo.Name, &foo.Price, &foo.Image, &foo.MenuId, &foo.DateCreated, &foo.DateUpdated)
+	err = f.conn.QueryRow(query, food.Name, food.Price, food.Image, food.MenuId, foodId).Scan(&foo.Id, &foo.Name, &foo.Price, &foo.Image, &foo.MenuId, &foo.DateCreated, &foo.DateUpdated)
 	if err != nil {
 		return
 	}
