@@ -1,24 +1,19 @@
 basePath: /api/v1
 definitions:
-  forms.Create:
+  forms.EditUser:
     properties:
+      address:
+        type: string
+      avatar:
+        type: string
       email:
         type: string
       first_name:
         type: string
       last_name:
         type: string
-      password:
-        minLength: 6
-        type: string
       phone_number:
         type: string
-    required:
-    - email
-    - first_name
-    - last_name
-    - password
-    - phone_number
     type: object
   forms.Login:
     properties:
@@ -31,11 +26,11 @@ definitions:
     - email
     - password
     type: object
-  models.User:
+  forms.User:
     properties:
-      date_created:
+      address:
         type: string
-      date_updated:
+      avatar:
         type: string
       email:
         type: string
@@ -44,10 +39,55 @@ definitions:
       last_name:
         type: string
       password:
+        minLength: 6
         type: string
       phone_number:
         type: string
-      user_id:
+      role:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - phone_number
+    type: object
+  models.User:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      role:
+        type: string
+    type: object
+  response.ErrorMessage:
+    properties:
+      code:
+        example: 400
+        type: integer
+      error: {}
+      message:
+        example: error when fetching
+        type: string
+      status:
+        example: failure
         type: string
     type: object
   response.SuccessMessage:
@@ -115,6 +155,33 @@ paths:
       summary: Get home route
       tags:
       - Home
+  /auth/clear:
+    delete:
+      description: Clear user auth
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logged out from all other device successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - ApiKeyAuth: []
+      summary: Clear Login Auth route
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -154,6 +221,33 @@ paths:
       summary: Login route
       tags:
       - Auth
+  /auth/logout:
+    post:
+      description: Logout user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logged out successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user route
+      tags:
+      - Auth
   /auth/register:
     post:
       consumes:
@@ -165,7 +259,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/forms.Create'
+          $ref: '#/definitions/forms.User'
       produces:
       - application/json
       responses:
@@ -224,6 +318,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
       summary: Get all user route
       tags:
       - Users
@@ -262,7 +358,109 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
       summary: Get user route
+      tags:
+      - Users
+  /users/profile:
+    delete:
+      description: Delete user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user route
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Get user profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user profile route
+      tags:
+      - Users
+    patch:
+      consumes:
+      - application/json
+      description: Edit user in the system
+      parameters:
+      - description: Edit Details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit user route
       tags:
       - Users
 schemes:

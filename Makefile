@@ -2,10 +2,10 @@ migrate_up:
 	migrate -path db/migration -database "" -verbose up
 
 migrate_down:
-	migrate -path db/migration -database "-verbose down
+	migrate -path db/migration -database "" -verbose down
 
 migrate_force:
-	migrate -path db/migration -database " force $(version)
+	migrate -path db/migration -database "" force $(version)
 
 run:	
 	go build restaurant-management-api.go && ./restaurant-management-api --migrate=false

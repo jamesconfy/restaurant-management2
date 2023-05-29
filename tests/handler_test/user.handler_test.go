@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +24,7 @@ func TestCreateUser(t *testing.T) {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", "/test/auth/register", bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewReader(obj))
 	req.Header.Set("Content-type", "application/json")
 
 	r.ServeHTTP(w, req)
@@ -32,6 +33,38 @@ func TestCreateUser(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
+}
+
+func TestCreateAdmin(t *testing.T) {
+	r := setupApp()
+	w := httptest.NewRecorder()
+
+	user := generateUserForm()
+	admin := generateAdminForm()
+	form := generateLoginForm(admin)
+	_ = createAndRegisterUser(admin)
+
+	auth := loginUserAndGenerateAuth(form)
+
+	obj, err := json.Marshal(user)
+	if err != nil {
+		panic(err)
+	}
+
+	req, _ := http.NewRequest("POST", "/api/v1/auth/register/admin", bytes.NewReader(obj))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", auth)
+
+	r.ServeHTTP(w, req)
+
+	resp, err := io.ReadAll(w.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(resp))
 
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
@@ -49,7 +82,7 @@ func TestLoginUser(t *testing.T) {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", "/test/auth/login", bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewReader(obj))
 	req.Header.Set("Content-type", "application/json")
 
 	r.ServeHTTP(w, req)
@@ -71,8 +104,9 @@ func TestGetUser_User(t *testing.T) {
 	user1 := createAndRegisterUser(user)
 
 	auth := loginUserAndGenerateAuth(form)
+	time.Sleep(5 * time.Second)
 
-	getUrl := fmt.Sprintf("/test/users/%v", user1.Id)
+	getUrl := fmt.Sprintf("/api/v1/users/%v", user1.Id)
 
 	req, _ := http.NewRequest("GET", getUrl, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -80,10 +114,12 @@ func TestGetUser_User(t *testing.T) {
 
 	r.ServeHTTP(w, req)
 
-	_, err := io.ReadAll(w.Body)
+	resp, err := io.ReadAll(w.Body)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(string(resp))
 
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
@@ -102,7 +138,7 @@ func TestGetAllUsers_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	req, _ := http.NewRequest("GET", "/test/users", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/users", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -113,7 +149,7 @@ func TestGetAllUsers_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
 }
 
 func TestGetUser_Admin(t *testing.T) {
@@ -128,7 +164,7 @@ func TestGetUser_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	getUrl := fmt.Sprintf("/test/users/%v", user.Id)
+	getUrl := fmt.Sprintf("/api/v1/users/%v", user.Id)
 
 	req, _ := http.NewRequest("GET", getUrl, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -152,13 +188,13 @@ func TestGetAllUsers_Admin(t *testing.T) {
 		_ = createAndRegisterUser(nil)
 	}
 
-	user := generateAdminForm()
-	form := generateLoginForm(user)
-	_ = createAndRegisterUser(user)
+	admin := generateAdminForm()
+	form := generateLoginForm(admin)
+	_ = createAndRegisterUser(admin)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	req, _ := http.NewRequest("GET", "/test/users", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/users", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 

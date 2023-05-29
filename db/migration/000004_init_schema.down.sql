@@ -1,1 +1,1 @@
-ALTER TABLE user DROP COLUMN address;
+ALTER TABLE users DROP COLUMN address;

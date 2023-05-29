@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/service"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/golang-migrate/migrate/v4"
 	postgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -19,14 +21,19 @@ import (
 
 var (
 	// Database
-	db       *sql.DB
-	userRepo repo.UserRepo
-	authRepo repo.AuthRepo
+	db        *sql.DB
+	userRepo  repo.UserRepo
+	tableRepo repo.TableRepo
+	authRepo  repo.AuthRepo
+
+	// Cashbin
+	cashbin *casbin.Enforcer
 
 	// Service
 	emailSrv service.EmailService
 	authSrv  service.AuthService
 	userSrv  service.UserService
+	tableSrv service.TableService
 )
 
 func init() {
@@ -75,15 +82,22 @@ func init() {
 		panic(err)
 	}
 
+	cashbin, err = casbin.NewEnforcer("../../model_test.conf", "../../policy_test.csv")
+	if err != nil {
+		log.Println("Cashbin: ", err)
+	}
+
 	userRepo = repo.NewUserRepo(db)
 	authRepo = repo.NewAuthRepo(db)
+	tableRepo = repo.NewTableRepo(db)
 
 	valiSrv := service.NewValidationService()
 	crySrv := service.NewCryptoService()
 	emailSrv = service.NewEmailService("fromEmail string", "password string", "host string", "port string")
 	authSrv = service.NewAuthService(authRepo, "")
 
-	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv)
+	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv, cashbin)
+	tableSrv = service.NewTableService(tableRepo, valiSrv, cashbin)
 }
 
 func initDBSchema(db *sql.DB) error {

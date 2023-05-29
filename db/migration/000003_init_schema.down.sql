@@ -1,1 +1,1 @@
-ALTER TABLE auth DROP COLUMN expires_at;
+ALTER TABLE auth DROP COLUMN IF EXISTS expires_at;

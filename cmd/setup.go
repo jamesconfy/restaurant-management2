@@ -42,12 +42,6 @@ func Setup() {
 	v1.Use(gin.Recovery())
 	router.Use(middleware.CORS())
 
-	e, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
-	if err != nil {
-		log.Println("Cashbin: ", err)
-	}
-	e.Enforce()
-
 	db, err := sql.New(dsn)
 	if err != nil {
 		log.Println("Error Connecting to DB: ", err)
@@ -55,11 +49,19 @@ func Setup() {
 	defer db.Close()
 	conn := db.GetConn()
 
+	cashbin, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
+	if err != nil {
+		log.Println("Cashbin: ", err)
+	}
+
 	// Auth Repository
 	authRepo := repo.NewAuthRepo(conn)
 
 	// User Repository
 	userRepo := repo.NewUserRepo(conn)
+
+	// Table Repository
+	tableRepo := repo.NewTableRepo(conn)
 
 	// Email Service
 	emailSrv := service.NewEmailService(email, email_passwd, email_host, email_port)
@@ -77,11 +79,18 @@ func Setup() {
 	homeSrv := service.NewHomeService()
 
 	// User Service
-	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv)
+	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv, cashbin)
+
+	// Table Service
+	tableSrv := service.NewTableService(tableRepo, validatorSrv, cashbin)
+
+	// Middleware
+	jwt := middleware.Authentication(authSrv, cashbin)
 
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
-	routes.UserRoute(v1, userSrv, authSrv)
+	routes.UserRoute(v1, userSrv, jwt)
+	routes.TableRoute(v1, tableSrv, jwt)
 	routes.ErrorRoute(router)
 
 	// Documentation

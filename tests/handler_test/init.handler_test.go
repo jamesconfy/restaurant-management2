@@ -4,12 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
+	"restaurant-management/cmd/middleware"
 	routes "restaurant-management/cmd/routes"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/service"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -26,11 +29,17 @@ var (
 	userRepo repo.UserRepo
 	authRepo repo.AuthRepo
 
+	// Cashbin
+	cashbin *casbin.Enforcer
+
 	// Service
 	homeSrv  service.HomeService
 	emailSrv service.EmailService
 	authSrv  service.AuthService
 	userSrv  service.UserService
+
+	// JWT
+	jwt middleware.JWT
 )
 
 func init() {
@@ -79,6 +88,11 @@ func init() {
 		panic(err)
 	}
 
+	cashbin, err = casbin.NewEnforcer("../../model_test.conf", "../../policy_test.csv")
+	if err != nil {
+		log.Println("Cashbin: ", err)
+	}
+
 	// Initialize Repository
 	userRepo = repo.NewUserRepo(db)
 	authRepo = repo.NewAuthRepo(db)
@@ -91,7 +105,10 @@ func init() {
 
 	// Initialize Services
 	homeSrv = service.NewHomeService()
-	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv)
+	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv, cashbin)
+
+	// JWT
+	jwt = middleware.Authentication(authSrv, cashbin)
 }
 
 func initDBSchema(db *sql.DB) error {
@@ -113,9 +130,9 @@ func initDBSchema(db *sql.DB) error {
 func setupApp() *gin.Engine {
 	router := gin.New()
 	gin.SetMode(gin.ReleaseMode)
-	v1 := router.Group("/test")
+	v1 := router.Group("/api/v1")
 
-	routes.UserRoute(v1, userSrv, authSrv)
+	routes.UserRoute(v1, userSrv, jwt)
 	routes.HomeRoute(v1, homeSrv)
 
 	return router

@@ -135,3 +135,48 @@ func TestGetAll(t *testing.T) {
 		})
 	}
 }
+
+func TestEditUser(t *testing.T) {
+	// Create a new user object
+	user := createAndAddUser(nil)
+	newUser := generateUser()
+
+	tests := []struct {
+		name    string
+		id      string
+		user    *models.User
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "Test with correct details", id: user.Id, user: newUser, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := u.Edit(tt.id, tt.user)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("userSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestDeleteUser(t *testing.T) {
+	user := createAndAddUser(nil)
+
+	tests := []struct {
+		name string
+		id   string
+		want bool
+	}{
+		{name: "Test with correct id", id: user.Id, want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := u.Delete(tt.id)
+			if (err != nil) != tt.want {
+				t.Errorf("userSql.Delete() error = %v, wantErr %v", err, tt.want)
+			}
+		})
+	}
+}

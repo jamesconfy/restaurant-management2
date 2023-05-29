@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN avatar VARCHAR(250) NULL DEFAULT 'https://ticked-v1-backend-bucket.s3.amazonaws.com/default.jpeg';

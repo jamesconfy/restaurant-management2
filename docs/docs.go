@@ -66,6 +66,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/clear": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Clear user auth",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Clear Login Auth route",
+                "responses": {
+                    "200": {
+                        "description": "Logged out from all other device successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Login route",
@@ -130,6 +173,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Logout user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout user route",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "description": "Register route",
@@ -150,7 +236,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.Create"
+                            "$ref": "#/definitions/forms.User"
                         }
                     }
                 ],
@@ -196,6 +282,11 @@ const docTemplate = `{
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all users in the system",
                 "consumes": [
                     "application/json"
@@ -250,8 +341,179 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/profile": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user profile route",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/se.ServiceError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/se.ServiceError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/se.ServiceError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user route",
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Edit user in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Edit user route",
+                "parameters": [
+                    {
+                        "description": "Edit Details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.EditUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/se.ServiceError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/se.ServiceError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/se.ServiceError"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{userId}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get user by id",
                 "consumes": [
                     "application/json"
@@ -314,16 +576,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "forms.Create": {
+        "forms.EditUser": {
             "type": "object",
-            "required": [
-                "email",
-                "first_name",
-                "last_name",
-                "password",
-                "phone_number"
-            ],
             "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -332,10 +593,6 @@ const docTemplate = `{
                 },
                 "last_name": {
                     "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 6
                 },
                 "phone_number": {
                     "type": "string"
@@ -358,13 +615,20 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
+        "forms.User": {
             "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "password",
+                "phone_number"
+            ],
             "properties": {
-                "date_created": {
+                "address": {
                     "type": "string"
                 },
-                "date_updated": {
+                "avatar": {
                     "type": "string"
                 },
                 "email": {
@@ -377,13 +641,70 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phone_number": {
                     "type": "string"
                 },
-                "user_id": {
+                "role": {
                     "type": "string"
+                }
+            }
+        },
+        "response.ErrorMessage": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "error": {},
+                "message": {
+                    "type": "string",
+                    "example": "error when fetching"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "failure"
                 }
             }
         },
