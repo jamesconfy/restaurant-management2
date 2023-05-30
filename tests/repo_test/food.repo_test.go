@@ -79,6 +79,34 @@ func TestGetAllFood(t *testing.T) {
 	}
 }
 
+func TestGetMenuFood(t *testing.T) {
+	menu := createAndAddMenu(nil)
+	for i := 0; i < 10; i++ {
+		_ = createAndAddFood(menu, nil)
+	}
+
+	tests := []struct {
+		name    string
+		menu    *models.Menu
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "Test with correct details", menu: menu, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			menufood, err := f.GetFoodByMenu(tt.menu)
+			for _, food := range menufood.Foods {
+				fmt.Println("Food Id: ", food.Id)
+			}
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("foodSql.GetFoodByMenu() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestEditFood(t *testing.T) {
 	menu := createAndAddMenu(nil)
 	food := createAndAddFood(menu, nil)

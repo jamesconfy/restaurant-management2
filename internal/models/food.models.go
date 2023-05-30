@@ -11,3 +11,10 @@ type Food struct {
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
+
+type MenuFood struct {
+	Menu   *Menu   `json:"menu"`
+	Foods  []*Food `json:"foods"`
+	MenuId string  `json:"-"`
+	FoodId string  `json:"-"`
+}

@@ -69,28 +69,19 @@ func Setup() {
 	// Token Service
 	authSrv := service.NewAuthService(authRepo, secret)
 
-	// Validation Service
-	validatorSrv := service.NewValidationService()
-
-	// Cryptography Service
-	cryptoSrv := service.NewCryptoService()
-
 	// Home Service
 	homeSrv := service.NewHomeService()
 
 	// User Service
-	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv, cashbin)
+	userSrv := service.NewUserService(userRepo, authRepo, authSrv, emailSrv)
 
 	// Table Service
-	tableSrv := service.NewTableService(tableRepo, validatorSrv, cashbin)
-
-	// Middleware
-	jwt := middleware.Authentication(authSrv, cashbin)
+	tableSrv := service.NewTableService(tableRepo)
 
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
-	routes.UserRoute(v1, userSrv, jwt)
-	routes.TableRoute(v1, tableSrv, jwt)
+	routes.UserRoute(v1, userSrv, authSrv, cashbin)
+	routes.TableRoute(v1, tableSrv, authSrv, cashbin)
 	routes.ErrorRoute(router)
 
 	// Documentation

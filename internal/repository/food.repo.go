@@ -9,6 +9,7 @@ type FoodRepo interface {
 	Add(food *models.Food) (foo *models.Food, err error)
 	Get(foodId string) (foo *models.Food, err error)
 	GetAll() (foods []*models.Food, err error)
+	GetFoodByMenu(menu *models.Menu) (*models.MenuFood, error)
 	Edit(foodId string, food *models.Food) (foo *models.Food, err error)
 }
 
@@ -27,6 +28,31 @@ func (f *foodRepo) Add(food *models.Food) (foo *models.Food, err error) {
 	}
 
 	return
+}
+
+func (f *foodRepo) GetFoodByMenu(menu *models.Menu) (*models.MenuFood, error) {
+	var menufood models.MenuFood
+
+	query := `SELECT m.id, f.id, f.name, f.price, f.image, f.date_created, f.date_updated FROM menu m JOIN food f ON f.menu_id = m.id WHERE m.id = $1;`
+
+	rows, err := f.conn.Query(query, menu.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var food models.Food
+
+		err := rows.Scan(&menufood.MenuId, &food.Id, &food.Name, &food.Price, &food.Image, &food.DateCreated, &food.DateUpdated)
+		if err != nil {
+			return nil, err
+		}
+
+		menufood.Foods = append(menufood.Foods, &food)
+	}
+
+	menufood.Menu = menu
+	return &menufood, nil
 }
 
 func (f *foodRepo) Get(foodId string) (foo *models.Food, err error) {
@@ -67,7 +93,7 @@ func (f *foodRepo) GetAll() (foods []*models.Food, err error) {
 func (f *foodRepo) Edit(foodId string, food *models.Food) (foo *models.Food, err error) {
 	foo = new(models.Food)
 
-	query := `UPDATE food SET name = $1, price = $2, image = $3, menu_id = $4 WHERE id = $5 RETURNING id, name, price, image, menu_id, date_created, date_updated`
+	query := `UPDATE food SET name = $1, price = $2, image = $3, menu_id = $4, date_updated = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id, name, price, image, menu_id, date_created, date_updated`
 
 	err = f.conn.QueryRow(query, food.Name, food.Price, food.Image, food.MenuId, foodId).Scan(&foo.Id, &foo.Name, &foo.Price, &foo.Image, &foo.MenuId, &foo.DateCreated, &foo.DateUpdated)
 	if err != nil {

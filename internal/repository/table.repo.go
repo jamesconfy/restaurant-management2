@@ -9,6 +9,7 @@ type TableRepo interface {
 	Add(table *models.Table) (*models.Table, error)
 	Get(id string) (tabl *models.Table, err error)
 	GetAll(role string) (tables []*models.Table, err error)
+	Edit(tableId string, table *models.Table) (tabl *models.Table, err error)
 	Delete(id string) (err error)
 }
 
@@ -68,6 +69,19 @@ func (t *tableSql) GetAll(role string) (tables []*models.Table, err error) {
 	return
 }
 
+func (t *tableSql) Edit(tableId string, table *models.Table) (tabl *models.Table, err error) {
+	tabl = new(models.Table)
+
+	query := `UPDATE tables SET seats = $1, booked = $2, date_updated = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, seats, number, booked, date_created, date_updated`
+
+	err = t.conn.QueryRow(query, table.Seats, table.Booked, tableId).Scan(&tabl.Id, &tabl.Seats, &tabl.Number, &tabl.Booked, &tabl.DateCreated, &tabl.DateUpdated)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (t *tableSql) Delete(id string) (err error) {
 	query := `DELETE FROM tables WHERE id = $1`
 
@@ -78,10 +92,6 @@ func (t *tableSql) Delete(id string) (err error) {
 
 	return
 }
-
-// func (t *tableSql) Book(book *models.Book) (tabl *models.Table, err error) {
-
-// }
 
 func NewTableRepo(conn *sql.DB) TableRepo {
 	return &tableSql{conn: conn}

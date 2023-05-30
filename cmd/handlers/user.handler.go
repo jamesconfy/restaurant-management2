@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"fmt"
 	"restaurant-management/internal/forms"
+	"restaurant-management/internal/models"
 	"restaurant-management/internal/response"
 	"restaurant-management/internal/se"
 	"restaurant-management/internal/service"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,9 +23,12 @@ type UserHandler interface {
 	Delete(c *gin.Context)
 	Logout(c *gin.Context)
 	ClearAuth(c *gin.Context)
+
+	addPolicy(user *models.User) error
 }
 
 type userHandler struct {
+	cashbin *casbin.Enforcer
 	userSrv service.UserService
 }
 
@@ -57,6 +63,12 @@ func (u *userHandler) Create(c *gin.Context) {
 	user, err := u.userSrv.Create(&req)
 	if err != nil {
 		response.Error(c, *err)
+		return
+	}
+
+	er := u.addPolicy(user)
+	if er != nil {
+		response.Error(c, *se.Internal(er))
 		return
 	}
 
@@ -254,8 +266,8 @@ func (u *userHandler) ClearAuth(c *gin.Context) {
 	response.Success201(c, "Logged out from all other device successfully", nil)
 }
 
-func NewUserHandler(userSrv service.UserService) UserHandler {
-	return &userHandler{userSrv: userSrv}
+func NewUserHandler(userSrv service.UserService, cashbin *casbin.Enforcer) UserHandler {
+	return &userHandler{userSrv: userSrv, cashbin: cashbin}
 }
 
 // Auxillary function
@@ -272,4 +284,15 @@ func (u *userHandler) getAuth(c *gin.Context) (auth string) {
 
 	auth = c.GetHeader(defaultCookieName)
 	return
+}
+
+func (u *userHandler) addPolicy(user *models.User) error {
+	if user.Role == "USER" {
+		obj := fmt.Sprintf("%s/%v", UserPath, user.Id)
+		u.cashbin.AddPolicy(user.Id, obj, PolicyMethodGet, PolicyEffectAllow)
+	}
+
+	u.cashbin.AddGroupingPolicy(user.Id, fmt.Sprintf("role::%v", strings.ToLower(user.Role)))
+
+	return u.cashbin.SavePolicy()
 }

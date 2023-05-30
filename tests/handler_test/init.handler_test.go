@@ -7,7 +7,6 @@ import (
 	"log"
 	"time"
 
-	"restaurant-management/cmd/middleware"
 	routes "restaurant-management/cmd/routes"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/service"
@@ -29,6 +28,9 @@ var (
 	userRepo repo.UserRepo
 	authRepo repo.AuthRepo
 
+	//
+	router *gin.Engine
+
 	// Cashbin
 	cashbin *casbin.Enforcer
 
@@ -37,9 +39,6 @@ var (
 	emailSrv service.EmailService
 	authSrv  service.AuthService
 	userSrv  service.UserService
-
-	// JWT
-	jwt middleware.JWT
 )
 
 func init() {
@@ -98,17 +97,15 @@ func init() {
 	authRepo = repo.NewAuthRepo(db)
 
 	// Initialize Services
-	valiSrv := service.NewValidationService()
-	crySrv := service.NewCryptoService()
 	emailSrv = service.NewEmailService("", "", "", "")
 	authSrv = service.NewAuthService(authRepo, "")
 
 	// Initialize Services
 	homeSrv = service.NewHomeService()
-	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv, cashbin)
+	userSrv = service.NewUserService(userRepo, authRepo, authSrv, emailSrv)
 
-	// JWT
-	jwt = middleware.Authentication(authSrv, cashbin)
+	// Router
+	router = setupApp()
 }
 
 func initDBSchema(db *sql.DB) error {
@@ -132,7 +129,7 @@ func setupApp() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	v1 := router.Group("/api/v1")
 
-	routes.UserRoute(v1, userSrv, jwt)
+	routes.UserRoute(v1, userSrv, authSrv, cashbin)
 	routes.HomeRoute(v1, homeSrv)
 
 	return router

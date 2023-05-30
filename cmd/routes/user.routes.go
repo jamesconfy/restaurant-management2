@@ -5,11 +5,13 @@ import (
 	"restaurant-management/cmd/middleware"
 	"restaurant-management/internal/service"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoute(router *gin.RouterGroup, userSrv service.UserService, jwt middleware.JWT) {
-	handler := handlers.NewUserHandler(userSrv)
+func UserRoute(router *gin.RouterGroup, userSrv service.UserService, authSrv service.AuthService, cashbin *casbin.Enforcer) {
+	handler := handlers.NewUserHandler(userSrv, cashbin)
+	jwt := middleware.Authentication(authSrv, cashbin)
 
 	user := router.Group("/users")
 	user.Use(jwt.CheckJWT())
