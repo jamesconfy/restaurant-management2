@@ -11,6 +11,10 @@ import (
 
 type MenuService interface {
 	Add(req *forms.Menu) (*models.Menu, *se.ServiceError)
+	Get(menuId string) (*models.Menu, *se.ServiceError)
+	GetAll() ([]*models.Menu, *se.ServiceError)
+	Edit(menuId string, req *forms.EditMenu) (*models.Menu, *se.ServiceError)
+	Delete(menuId string) *se.ServiceError
 }
 
 type menuSrv struct {
@@ -18,7 +22,7 @@ type menuSrv struct {
 }
 
 func (m *menuSrv) Add(req *forms.Menu) (*models.Menu, *se.ServiceError) {
-	if err := Validator.Validate(req); err != nil {
+	if err := Validator.validate(req); err != nil {
 		return nil, se.Validating(err)
 	}
 

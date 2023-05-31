@@ -23,6 +23,19 @@ type tableHandler struct {
 	cashbin  *casbin.Enforcer
 }
 
+// Add Table godoc
+// @Summary	Add table route
+// @Description	Provide details to add table
+// @Tags	Table
+// @Accept	json
+// @Produce	json
+// @Param	request	body	forms.Table	true "Table details"
+// @Success	200  {object}  response.SuccessMessage{data=models.Table}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/tables [post]
+// @Security ApiKeyAuth
 func (ta *tableHandler) Add(c *gin.Context) {
 	var req forms.Table
 
@@ -39,6 +52,19 @@ func (ta *tableHandler) Add(c *gin.Context) {
 	response.Success(c, "table created successfully", table)
 }
 
+// Get Table godoc
+// @Summary	Get table route
+// @Description	Provide details to get table
+// @Tags	Table
+// @Accept	json
+// @Produce	json
+// @Param	tableId	path	string	true "Table Id"
+// @Success	200  {object}  response.SuccessMessage{data=models.Table}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/tables/:tableId [get]
+// @Security ApiKeyAuth
 func (ta *tableHandler) Get(c *gin.Context) {
 	table, err := ta.tableSrv.Get(c.Param("tableId"))
 	if err != nil {
@@ -49,6 +75,18 @@ func (ta *tableHandler) Get(c *gin.Context) {
 	response.Success(c, "table fetched successfully", table)
 }
 
+// Get All Table godoc
+// @Summary	Get all table route
+// @Description	Provide details to get table
+// @Tags	Table
+// @Accept	json
+// @Produce	json
+// @Success	200  {object}  response.SuccessMessage{data=[]models.Table}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/tables [get]
+// @Security ApiKeyAuth
 func (ta *tableHandler) GetAll(c *gin.Context) {
 	tables, err := ta.tableSrv.GetAll(c.GetString("role"))
 	if err != nil {
@@ -59,6 +97,20 @@ func (ta *tableHandler) GetAll(c *gin.Context) {
 	response.Success(c, "tables fetched successfully", tables, len(tables))
 }
 
+// Edit Table godoc
+// @Summary	Edit table route
+// @Description	Provide details to edit table
+// @Tags	Table
+// @Accept	json
+// @Produce	json
+// @Param	tableId	path	string	true "Table Id"
+// @Param	request	body	forms.EditTable	true "Table details"
+// @Success	200  {object}  response.SuccessMessage{data=models.Table}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/tables/:tableId [patch]
+// @Security ApiKeyAuth
 func (ta *tableHandler) Edit(c *gin.Context) {
 	var req forms.EditTable
 
@@ -76,6 +128,19 @@ func (ta *tableHandler) Edit(c *gin.Context) {
 	response.Success(c, "table updated successfully", table)
 }
 
+// Edit Table godoc
+// @Summary	Edit table route
+// @Description	Provide details to edit table
+// @Tags	Table
+// @Accept	json
+// @Produce	json
+// @Param	tableId	path	string	true "Table Id"
+// @Success	200  {string}  string	"table deleted successfully"
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/tables/:tableId [delete]
+// @Security ApiKeyAuth
 func (ta *tableHandler) Delete(c *gin.Context) {
 	err := ta.tableSrv.Delete(c.Param("tableId"))
 	if err != nil {

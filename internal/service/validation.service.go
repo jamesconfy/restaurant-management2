@@ -6,6 +6,6 @@ var Validator validationStruct
 
 type validationStruct struct{}
 
-func (v *validationStruct) Validate(a any) error {
+func (v *validationStruct) validate(a any) error {
 	return validator.New().Struct(a)
 }

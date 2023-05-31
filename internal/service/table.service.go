@@ -22,7 +22,7 @@ type tableSrv struct {
 }
 
 func (ta *tableSrv) Add(req *forms.Table) (*models.Table, *se.ServiceError) {
-	if err := Validator.Validate(req); err != nil {
+	if err := Validator.validate(req); err != nil {
 		return nil, se.Validating(err)
 	}
 
@@ -62,7 +62,7 @@ func (ta *tableSrv) GetAll(role string) ([]*models.Table, *se.ServiceError) {
 }
 
 func (ta *tableSrv) Edit(tableId string, req *forms.EditTable) (*models.Table, *se.ServiceError) {
-	if err := Validator.Validate(req); err != nil {
+	if err := Validator.validate(req); err != nil {
 		return nil, se.Validating(err)
 	}
 

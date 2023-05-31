@@ -7,6 +7,7 @@ import (
 
 type MenuRepo interface {
 	Check(name, category string) (bool, error)
+	CheckMenuExists(menuId string) (bool, error)
 
 	Add(menu *models.Menu) (men *models.Menu, err error)
 	Get(menuId string) (men *models.Menu, err error)
@@ -17,6 +18,26 @@ type MenuRepo interface {
 
 type menuRepo struct {
 	conn *sql.DB
+}
+
+// CheckMenu implements MenuRepo
+func (m *menuRepo) CheckMenuExists(menuId string) (bool, error) {
+	var name string
+
+	query := `SELECT name FROM menu WHERE id = $1`
+
+	err := m.conn.QueryRow(query, menuId).Scan(&name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Name and Category does not exist
+			return false, nil
+		}
+		// An error occurred while executing the query
+		return true, err
+	}
+
+	// Name and Category already exists
+	return true, nil
 }
 
 func (m *menuRepo) Check(name, category string) (bool, error) {

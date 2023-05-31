@@ -6,7 +6,7 @@ var Crypto cryptoSrv
 
 type cryptoSrv struct{}
 
-func (c cryptoSrv) HashPassword(password string) (string, error) {
+func (c cryptoSrv) hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return "", err
@@ -15,6 +15,6 @@ func (c cryptoSrv) HashPassword(password string) (string, error) {
 	return string(bytes), nil
 }
 
-func (c cryptoSrv) ComparePassword(hashed, plain string) bool {
+func (c cryptoSrv) comparePassword(hashed, plain string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain)) == nil
 }

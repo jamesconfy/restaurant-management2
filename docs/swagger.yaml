@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  forms.EditTable:
+    properties:
+      booked:
+        type: boolean
+      seats:
+        type: integer
+    type: object
   forms.EditUser:
     properties:
       address:
@@ -26,6 +33,14 @@ definitions:
     - email
     - password
     type: object
+  forms.Table:
+    properties:
+      seats:
+        minimum: 1
+        type: integer
+    required:
+    - seats
+    type: object
   forms.User:
     properties:
       address:
@@ -51,6 +66,21 @@ definitions:
     - last_name
     - password
     - phone_number
+    type: object
+  models.Table:
+    properties:
+      booked:
+        type: boolean
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      number:
+        type: integer
+      seats:
+        type: integer
     type: object
   models.User:
     properties:
@@ -287,6 +317,201 @@ paths:
       summary: Register route
       tags:
       - Auth
+  /tables:
+    get:
+      consumes:
+      - application/json
+      description: Provide details to get table
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Table'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all table route
+      tags:
+      - Table
+    post:
+      consumes:
+      - application/json
+      description: Provide details to add table
+      parameters:
+      - description: Table details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Table'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Table'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Add table route
+      tags:
+      - Table
+  /tables/:tableId:
+    delete:
+      consumes:
+      - application/json
+      description: Provide details to edit table
+      parameters:
+      - description: Table Id
+        in: path
+        name: tableId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: table deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit table route
+      tags:
+      - Table
+    get:
+      consumes:
+      - application/json
+      description: Provide details to get table
+      parameters:
+      - description: Table Id
+        in: path
+        name: tableId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Table'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get table route
+      tags:
+      - Table
+    patch:
+      consumes:
+      - application/json
+      description: Provide details to edit table
+      parameters:
+      - description: Table Id
+        in: path
+        name: tableId
+        required: true
+        type: string
+      - description: Table details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditTable'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Table'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit table route
+      tags:
+      - Table
   /users:
     get:
       consumes:
@@ -329,7 +554,7 @@ paths:
       - application/json
       description: Get user by id
       parameters:
-      - description: User id
+      - description: User Id
         in: path
         name: userId
         required: true

@@ -87,15 +87,15 @@ func TestGetMenuFood(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		menu    *models.Menu
+		id      string
 		wantErr bool
 	}{
 		// TODO: Add test cases.
-		{name: "Test with correct details", menu: menu, wantErr: false},
+		{name: "Test with correct details", id: menu.Id, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			menufood, err := f.GetFoodByMenu(tt.menu)
+			menufood, err := f.GetFoodByMenu(tt.id)
 			for _, food := range menufood.Foods {
 				fmt.Println("Food Id: ", food.Id)
 			}
@@ -128,6 +128,29 @@ func TestEditFood(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("foodSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestDeleteFood(t *testing.T) {
+	menu := createAndAddMenu(nil)
+	food := createAndAddFood(menu, nil)
+
+	tests := []struct {
+		name    string
+		id      string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "Test with correct details", id: food.Id, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := f.Delete(tt.id)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("foodSql.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

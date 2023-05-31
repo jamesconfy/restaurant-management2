@@ -29,7 +29,14 @@ dev)
     ;;
 
 docker)
-    eval $(awk '!/^#/ && NF > 0 {print "export "  $1}' .env.docker) && docker compose up -d --build
+    eval $(awk '!/^#/ && NF > 0 {print "export "  $1}' .env.docker)
+    b=$(getFlag "b" $@)
+
+    if [[ $b == "true" ]]; then
+        docker compose up -d --build
+    else
+        docker compose up
+    fi
     ;;
 
 prod)
