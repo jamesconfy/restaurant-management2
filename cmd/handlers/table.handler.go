@@ -47,6 +47,7 @@ func (ta *tableHandler) Add(c *gin.Context) {
 	table, err := ta.tableSrv.Add(&req)
 	if err != nil {
 		response.Error(c, *err)
+		return
 	}
 
 	response.Success(c, "table created successfully", table)
@@ -58,12 +59,12 @@ func (ta *tableHandler) Add(c *gin.Context) {
 // @Tags	Table
 // @Accept	json
 // @Produce	json
-// @Param	tableId	path	string	true "Table Id"
+// @Param	tableId	path	string	true "Table Id"  Format(uuid)
 // @Success	200  {object}  response.SuccessMessage{data=models.Table}
 // @Failure	400  {object}  se.ServiceError
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
-// @Router	/tables/:tableId [get]
+// @Router	/tables/{tableId} [get]
 // @Security ApiKeyAuth
 func (ta *tableHandler) Get(c *gin.Context) {
 	table, err := ta.tableSrv.Get(c.Param("tableId"))
@@ -103,13 +104,13 @@ func (ta *tableHandler) GetAll(c *gin.Context) {
 // @Tags	Table
 // @Accept	json
 // @Produce	json
-// @Param	tableId	path	string	true "Table Id"
+// @Param	tableId	path	string	true "Table Id"  Format(uuid)
 // @Param	request	body	forms.EditTable	true "Table details"
 // @Success	200  {object}  response.SuccessMessage{data=models.Table}
 // @Failure	400  {object}  se.ServiceError
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
-// @Router	/tables/:tableId [patch]
+// @Router	/tables/{tableId} [patch]
 // @Security ApiKeyAuth
 func (ta *tableHandler) Edit(c *gin.Context) {
 	var req forms.EditTable
@@ -128,18 +129,18 @@ func (ta *tableHandler) Edit(c *gin.Context) {
 	response.Success(c, "table updated successfully", table)
 }
 
-// Edit Table godoc
-// @Summary	Edit table route
-// @Description	Provide details to edit table
+// Delete Table godoc
+// @Summary	Delete table route
+// @Description	Provide details to delete a table
 // @Tags	Table
 // @Accept	json
 // @Produce	json
-// @Param	tableId	path	string	true "Table Id"
+// @Param	tableId	path	string	true "Table Id"  Format(uuid)
 // @Success	200  {string}  string	"table deleted successfully"
 // @Failure	400  {object}  se.ServiceError
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
-// @Router	/tables/:tableId [delete]
+// @Router	/tables/{tableId} [delete]
 // @Security ApiKeyAuth
 func (ta *tableHandler) Delete(c *gin.Context) {
 	err := ta.tableSrv.Delete(c.Param("tableId"))

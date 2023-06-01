@@ -111,7 +111,7 @@ func (u *userHandler) Login(c *gin.Context) {
 // @Tags	Users
 // @Accept	json
 // @Produce	json
-// @Param	userId	path	string	true	"User Id"
+// @Param	userId	path	string	true	"User Id" Format(uuid)
 // @Success	200  {object}  response.SuccessMessage{data=models.User}
 // @Failure	400  {object}  se.ServiceError
 // @Failure	404  {object}  se.ServiceError

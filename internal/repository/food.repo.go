@@ -9,7 +9,6 @@ type FoodRepo interface {
 	Add(food *models.Food) (foo *models.Food, err error)
 	Get(foodId string) (foo *models.Food, err error)
 	GetAll() (foods []*models.Food, err error)
-	GetFoodByMenu(menuId string) (*models.MenuFood, error)
 	Edit(foodId string, food *models.Food) (foo *models.Food, err error)
 	Delete(foodId string) error
 }
@@ -29,30 +28,6 @@ func (f *foodRepo) Add(food *models.Food) (foo *models.Food, err error) {
 	}
 
 	return
-}
-
-func (f *foodRepo) GetFoodByMenu(menuId string) (*models.MenuFood, error) {
-	var menufood models.MenuFood
-
-	query := `SELECT m.id, f.id, f.name, f.price, f.image, f.date_created, f.date_updated FROM menu m JOIN food f ON f.menu_id = m.id WHERE m.id = $1;`
-
-	rows, err := f.conn.Query(query, menuId)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		var food models.Food
-
-		err := rows.Scan(&menufood.MenuId, &food.Id, &food.Name, &food.Price, &food.Image, &food.DateCreated, &food.DateUpdated)
-		if err != nil {
-			return nil, err
-		}
-
-		menufood.Foods = append(menufood.Foods, &food)
-	}
-
-	return &menufood, nil
 }
 
 func (f *foodRepo) Get(foodId string) (foo *models.Food, err error) {

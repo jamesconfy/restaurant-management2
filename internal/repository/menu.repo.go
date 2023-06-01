@@ -10,9 +10,9 @@ type MenuRepo interface {
 	CheckMenuExists(menuId string) (bool, error)
 
 	Add(menu *models.Menu) (men *models.Menu, err error)
-	Get(menuId string) (men *models.Menu, err error)
+	Get(menuId string) (men *models.MenuFood, err error)
 	GetAll() (menu []*models.Menu, err error)
-	Edit(menu *models.Menu) (men *models.Menu, err error)
+	Edit(menuId string, menu *models.Menu) (men *models.Menu, err error)
 	Delete(menuId string) error
 }
 
@@ -72,17 +72,48 @@ func (m *menuRepo) Add(menu *models.Menu) (men *models.Menu, err error) {
 	return
 }
 
-func (m *menuRepo) Get(menuId string) (men *models.Menu, err error) {
-	men = new(models.Menu)
+func (m *menuRepo) get(menuId string) (menu *models.Menu, err error) {
+	menu = new(models.Menu)
 
 	query := `SELECT id, name, category, date_created, date_updated FROM menu WHERE id = $1`
 
-	err = m.conn.QueryRow(query, menuId).Scan(&men.Id, &men.Name, &men.Category, &men.DateCreated, &men.DateUpdated)
+	err = m.conn.QueryRow(query, menuId).Scan(&menu.Id, &menu.Name, &menu.Category, &menu.DateCreated, &menu.DateUpdated)
 	if err != nil {
 		return
 	}
 
 	return
+}
+
+func (m *menuRepo) Get(menuId string) (*models.MenuFood, error) {
+	var menufood models.MenuFood
+
+	menu, err := m.get(menuId)
+	if err != nil {
+		return nil, err
+	}
+
+	menufood.Menu = menu
+
+	query := `SELECT f.id, f.name, f.price, f.image, f.date_created, f.date_updated FROM food f WHERE f.menu_id = $1;`
+
+	rows, err := m.conn.Query(query, menuId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var food models.Food
+
+		err := rows.Scan(&food.Id, &food.Name, &food.Price, &food.Image, &food.DateCreated, &food.DateUpdated)
+		if err != nil {
+			return nil, err
+		}
+
+		menufood.Foods = append(menufood.Foods, &food)
+	}
+
+	return &menufood, nil
 }
 
 func (m *menuRepo) GetAll() (menu []*models.Menu, err error) {
@@ -107,12 +138,12 @@ func (m *menuRepo) GetAll() (menu []*models.Menu, err error) {
 	return
 }
 
-func (m *menuRepo) Edit(menu *models.Menu) (men *models.Menu, err error) {
+func (m *menuRepo) Edit(menuId string, menu *models.Menu) (men *models.Menu, err error) {
 	men = new(models.Menu)
 
 	query := `UPDATE menu SET name = $1, category = $2, date_updated = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, name, category, date_created, date_updated`
 
-	err = m.conn.QueryRow(query, menu.Name, menu.Category, menu.Id).Scan(&men.Id, &men.Name, &men.Category, &men.DateCreated, &men.DateUpdated)
+	err = m.conn.QueryRow(query, menu.Name, menu.Category, menuId).Scan(&men.Id, &men.Name, &men.Category, &men.DateCreated, &men.DateUpdated)
 	if err != nil {
 		return
 	}

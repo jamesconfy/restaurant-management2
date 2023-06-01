@@ -16,5 +16,4 @@ type MenuFood struct {
 	Menu   *Menu   `json:"menu"`
 	Foods  []*Food `json:"foods"`
 	MenuId string  `json:"-"`
-	FoodId string  `json:"-"`
 }

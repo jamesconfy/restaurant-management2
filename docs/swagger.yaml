@@ -1,5 +1,23 @@
 basePath: /api/v1
 definitions:
+  forms.EditFood:
+    properties:
+      image:
+        type: string
+      menu_id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  forms.EditMenu:
+    properties:
+      category:
+        type: string
+      name:
+        type: string
+    type: object
   forms.EditTable:
     properties:
       booked:
@@ -22,6 +40,23 @@ definitions:
       phone_number:
         type: string
     type: object
+  forms.Food:
+    properties:
+      image:
+        type: string
+      menu_id:
+        type: string
+      name:
+        minLength: 1
+        type: string
+      price:
+        minimum: 0
+        type: number
+    required:
+    - menu_id
+    - name
+    - price
+    type: object
   forms.Login:
     properties:
       email:
@@ -32,6 +67,18 @@ definitions:
     required:
     - email
     - password
+    type: object
+  forms.Menu:
+    properties:
+      category:
+        minLength: 1
+        type: string
+      name:
+        minLength: 1
+        type: string
+    required:
+    - category
+    - name
     type: object
   forms.Table:
     properties:
@@ -66,6 +113,36 @@ definitions:
     - last_name
     - password
     - phone_number
+    type: object
+  models.Food:
+    properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      menu_id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  models.Menu:
+    properties:
+      category:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
     type: object
   models.Table:
     properties:
@@ -317,6 +394,394 @@ paths:
       summary: Register route
       tags:
       - Auth
+  /foods:
+    get:
+      consumes:
+      - application/json
+      description: Provide details to get all food
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Food'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      summary: Get all Food route
+      tags:
+      - Food
+    post:
+      consumes:
+      - application/json
+      description: Provide details to add food
+      parameters:
+      - description: Food details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Food'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Food'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Add Food route
+      tags:
+      - Food
+  /foods/{foodId}:
+    delete:
+      consumes:
+      - application/json
+      description: Provide details to delete food
+      parameters:
+      - description: Food Id
+        format: uuid
+        in: path
+        name: foodId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: food deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Food route
+      tags:
+      - Food
+    get:
+      consumes:
+      - application/json
+      description: Provide details to get food
+      parameters:
+      - description: Food Id
+        format: uuid
+        in: path
+        name: foodId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Food'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      summary: Get Food route
+      tags:
+      - Food
+    patch:
+      consumes:
+      - application/json
+      description: Provide details to edit food
+      parameters:
+      - description: Food Id
+        format: uuid
+        in: path
+        name: foodId
+        required: true
+        type: string
+      - description: Food details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditFood'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Food'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit Food route
+      tags:
+      - Food
+  /menus:
+    get:
+      consumes:
+      - application/json
+      description: Provide details to get all menu
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Menu'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      summary: Get all menu route
+      tags:
+      - Menu
+    post:
+      consumes:
+      - application/json
+      description: Provide details to add menu
+      parameters:
+      - description: Menu details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Menu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Menu'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Add Menu route
+      tags:
+      - Menu
+  /menus/{menuId}:
+    delete:
+      consumes:
+      - application/json
+      description: Provide details to delete a menu
+      parameters:
+      - description: Menu Id
+        format: uuid
+        in: path
+        name: menuId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: menu deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete menu route
+      tags:
+      - Menu
+    get:
+      consumes:
+      - application/json
+      description: Provide details to get menu
+      parameters:
+      - description: Menu Id
+        format: uuid
+        in: path
+        name: menuId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Menu'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      summary: Get menu route
+      tags:
+      - Menu
+    patch:
+      consumes:
+      - application/json
+      description: Provide details to edit menu
+      parameters:
+      - description: Menu Id
+        format: uuid
+        in: path
+        name: menuId
+        required: true
+        type: string
+      - description: Menu details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditMenu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Menu'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit menu route
+      tags:
+      - Menu
   /tables:
     get:
       consumes:
@@ -393,13 +858,14 @@ paths:
       summary: Add table route
       tags:
       - Table
-  /tables/:tableId:
+  /tables/{tableId}:
     delete:
       consumes:
       - application/json
-      description: Provide details to edit table
+      description: Provide details to delete a table
       parameters:
       - description: Table Id
+        format: uuid
         in: path
         name: tableId
         required: true
@@ -425,7 +891,7 @@ paths:
             $ref: '#/definitions/se.ServiceError'
       security:
       - ApiKeyAuth: []
-      summary: Edit table route
+      summary: Delete table route
       tags:
       - Table
     get:
@@ -434,6 +900,7 @@ paths:
       description: Provide details to get table
       parameters:
       - description: Table Id
+        format: uuid
         in: path
         name: tableId
         required: true
@@ -473,6 +940,7 @@ paths:
       description: Provide details to edit table
       parameters:
       - description: Table Id
+        format: uuid
         in: path
         name: tableId
         required: true
@@ -555,6 +1023,7 @@ paths:
       description: Get user by id
       parameters:
       - description: User Id
+        format: uuid
         in: path
         name: userId
         required: true

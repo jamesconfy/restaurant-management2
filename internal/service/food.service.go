@@ -10,10 +10,9 @@ import (
 )
 
 type FoodService interface {
-	Add(menuId string, req *forms.Food) (*models.Food, *se.ServiceError)
+	Add(req *forms.Food) (*models.Food, *se.ServiceError)
 	Get(foodId string) (*models.Food, *se.ServiceError)
 	GetAll() ([]*models.Food, *se.ServiceError)
-	GetFoodsByMenu(menuId string) (*models.MenuFood, *se.ServiceError)
 	Edit(foodId string, req *forms.EditFood) (*models.Food, *se.ServiceError)
 	Delete(foodId string) *se.ServiceError
 }
@@ -24,16 +23,16 @@ type foodSrv struct {
 }
 
 // Add implements FoodService
-func (f *foodSrv) Add(menuId string, req *forms.Food) (*models.Food, *se.ServiceError) {
+func (f *foodSrv) Add(req *forms.Food) (*models.Food, *se.ServiceError) {
 	if err := Validator.validate(req); err != nil {
 		return nil, se.Validating(err)
 	}
 
-	if _, err := uuid.Parse(menuId); err != nil {
+	if _, err := uuid.Parse(req.MenuId); err != nil {
 		return nil, se.Validating(err)
 	}
 
-	ok, err := f.menuRepo.CheckMenuExists(menuId)
+	ok, err := f.menuRepo.CheckMenuExists(req.MenuId)
 	if err != nil || !ok {
 		return nil, se.NotFoundOrInternal(err, "menu not found")
 	}
@@ -43,7 +42,7 @@ func (f *foodSrv) Add(menuId string, req *forms.Food) (*models.Food, *se.Service
 	food.Name = req.Name
 	food.Price = req.Price
 	food.Image = req.Image
-	food.MenuId = menuId
+	food.MenuId = req.MenuId
 
 	foo, err := f.repo.Add(&food)
 	if err != nil {
@@ -77,25 +76,6 @@ func (f *foodSrv) GetAll() ([]*models.Food, *se.ServiceError) {
 	return foods, nil
 }
 
-// GetFoodByMenu implements FoodService
-func (f *foodSrv) GetFoodsByMenu(menuId string) (*models.MenuFood, *se.ServiceError) {
-	if _, err := uuid.Parse(menuId); err != nil {
-		return nil, se.Validating(err)
-	}
-
-	ok, err := f.menuRepo.CheckMenuExists(menuId)
-	if err != nil || !ok {
-		return nil, se.NotFoundOrInternal(err, "menu not found")
-	}
-
-	food, err := f.repo.GetFoodByMenu(menuId)
-	if err != nil {
-		return nil, se.NotFoundOrInternal(err, "food not found")
-	}
-
-	return food, nil
-}
-
 // Edit implements FoodService
 func (f *foodSrv) Edit(foodId string, req *forms.EditFood) (*models.Food, *se.ServiceError) {
 	if _, err := uuid.Parse(foodId); err != nil {
@@ -111,7 +91,10 @@ func (f *foodSrv) Edit(foodId string, req *forms.EditFood) (*models.Food, *se.Se
 		return nil, se.NotFoundOrInternal(err, "food not found")
 	}
 
-	food = f.getEdit(req, food)
+	food, er := f.getEdit(req, food)
+	if er != nil {
+		return nil, er
+	}
 
 	foo, err := f.repo.Edit(foodId, food)
 	if err != nil {
@@ -140,7 +123,7 @@ func NewFoodService(repo repo.FoodRepo, menuRepo repo.MenuRepo) FoodService {
 }
 
 // Auxillary Function
-func (f *foodSrv) getEdit(req *forms.EditFood, food *models.Food) *models.Food {
+func (f *foodSrv) getEdit(req *forms.EditFood, food *models.Food) (*models.Food, *se.ServiceError) {
 	if req.Name != "" && req.Name != food.Name {
 		food.Name = req.Name
 	}
@@ -153,5 +136,17 @@ func (f *foodSrv) getEdit(req *forms.EditFood, food *models.Food) *models.Food {
 		food.Price = req.Price
 	}
 
-	return food
+	if req.MenuId != "" && req.MenuId != food.MenuId {
+		if _, err := uuid.Parse(req.MenuId); err != nil {
+			return nil, se.Validating(err)
+		}
+
+		if ok, err := f.menuRepo.CheckMenuExists(req.MenuId); err != nil || !ok {
+			return nil, se.NotFoundOrInternal(err, "menu not found")
+		}
+
+		food.MenuId = req.MenuId
+	}
+
+	return food, nil
 }

@@ -11,7 +11,7 @@ import (
 
 type MenuService interface {
 	Add(req *forms.Menu) (*models.Menu, *se.ServiceError)
-	Get(menuId string) (*models.Menu, *se.ServiceError)
+	Get(menuId string) (*models.MenuFood, *se.ServiceError)
 	GetAll() ([]*models.Menu, *se.ServiceError)
 	Edit(menuId string, req *forms.EditMenu) (*models.Menu, *se.ServiceError)
 	Delete(menuId string) *se.ServiceError
@@ -43,9 +43,9 @@ func (m *menuSrv) Add(req *forms.Menu) (*models.Menu, *se.ServiceError) {
 	return men, nil
 }
 
-func (m *menuSrv) Get(menuId string) (*models.Menu, *se.ServiceError) {
+func (m *menuSrv) Get(menuId string) (*models.MenuFood, *se.ServiceError) {
 	if _, err := uuid.Parse(menuId); err != nil {
-		return nil, se.Internal(err, "invalid menu id")
+		return nil, se.Validating(err)
 	}
 
 	menu, err := m.repo.Get(menuId)
@@ -75,17 +75,17 @@ func (m *menuSrv) Edit(menuId string, req *forms.EditMenu) (*models.Menu, *se.Se
 		return nil, se.NotFoundOrInternal(err, "menu not found")
 	}
 
-	menu, er := m.getEdit(req, menu)
+	men, er := m.getEdit(req, menu)
 	if er != nil {
 		return nil, er
 	}
 
-	men, err := m.repo.Edit(menu)
+	resultMenu, err := m.repo.Edit(menuId, men)
 	if err != nil {
 		return nil, se.Internal(err)
 	}
 
-	return men, nil
+	return resultMenu, nil
 }
 
 func (m *menuSrv) Delete(menuId string) *se.ServiceError {
@@ -105,18 +105,18 @@ func NewMenuService(repo repo.MenuRepo) MenuService {
 	return &menuSrv{repo: repo}
 }
 
-func (m *menuSrv) getEdit(req *forms.EditMenu, menu *models.Menu) (*models.Menu, *se.ServiceError) {
-	if req.Name != "" && req.Name != menu.Name {
-		menu.Name = req.Name
+func (m *menuSrv) getEdit(req *forms.EditMenu, menu *models.MenuFood) (*models.Menu, *se.ServiceError) {
+	if req.Name != "" && req.Name != menu.Menu.Name {
+		menu.Menu.Name = req.Name
 	}
 
-	if req.Category != "" && req.Category != menu.Category {
-		menu.Category = req.Category
+	if req.Category != "" && req.Category != menu.Menu.Category {
+		menu.Menu.Category = req.Category
 	}
 
 	if ok, err := m.repo.Check(req.Name, req.Category); ok {
 		return nil, se.ConflictOrInternal(err, "name and category already exists")
 	}
 
-	return menu, nil
+	return menu.Menu, nil
 }

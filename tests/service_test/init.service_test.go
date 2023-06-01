@@ -109,5 +109,11 @@ func initDBSchema(db *sql.DB) error {
 		return err
 	}
 
-	return m.Up()
+	err = m.Up()
+	if err != nil {
+		fmt.Println("Error: ", err)
+		panic(err)
+	}
+
+	return nil
 }

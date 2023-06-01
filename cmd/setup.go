@@ -64,6 +64,12 @@ func Setup() {
 	// Table Repository
 	tableRepo := repo.NewTableRepo(conn)
 
+	// Menu Repository
+	menuRepo := repo.NewMenuRepo(conn)
+
+	// Food Repository
+	foodRepo := repo.NewFoodRepo(conn)
+
 	// Email Service
 	emailSrv := service.NewEmailService(email, email_passwd, email_host, email_port)
 
@@ -79,10 +85,18 @@ func Setup() {
 	// Table Service
 	tableSrv := service.NewTableService(tableRepo)
 
+	// Menu Service
+	menuSrv := service.NewMenuService(menuRepo)
+
+	// Food Service
+	foodSrv := service.NewFoodService(foodRepo, menuRepo)
+
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
 	routes.UserRoute(v1, userSrv, authSrv, cashbin)
 	routes.TableRoute(v1, tableSrv, authSrv, cashbin)
+	routes.MenuRoute(v1, menuSrv, authSrv, cashbin)
+	routes.FoodRoutes(v1, foodSrv, authSrv, cashbin)
 	routes.ErrorRoute(router)
 
 	// Documentation
@@ -158,5 +172,3 @@ func loadProd() {
 	gin.DefaultWriter = io.MultiWriter(os.Stdout, logger.NewLogger())
 	gin.DisableConsoleColor()
 }
-
-var _ = loadProd
