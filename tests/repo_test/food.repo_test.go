@@ -104,3 +104,26 @@ func TestEditFood(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteFood(t *testing.T) {
+	menu := createAndAddMenu(nil)
+	food := createAndAddFood(menu, nil)
+
+	tests := []struct {
+		name    string
+		id      string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "Test with correct details", id: food.Id, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := f.Delete(tt.id)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("foodSql.Delete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

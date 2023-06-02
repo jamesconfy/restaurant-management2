@@ -1,12 +1,16 @@
 package handlers
 
 import (
+	"fmt"
 	"restaurant-management/internal/forms"
+	"restaurant-management/internal/models"
 	"restaurant-management/internal/response"
 	"restaurant-management/internal/se"
 	"restaurant-management/internal/service"
+	"restaurant-management/utils"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,9 +24,12 @@ type UserHandler interface {
 	Delete(c *gin.Context)
 	Logout(c *gin.Context)
 	ClearAuth(c *gin.Context)
+
+	addPolicy(user *models.User) error
 }
 
 type userHandler struct {
+	cashbin *casbin.Enforcer
 	userSrv service.UserService
 }
 
@@ -60,7 +67,13 @@ func (u *userHandler) Create(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "user created successfully", user)
+	er := u.addPolicy(user)
+	if er != nil {
+		response.Error(c, *se.Internal(er))
+		return
+	}
+
+	response.Success(c, fmt.Sprintf("%s created successfully", strings.ToLower(user.Role)), user)
 }
 
 // Login User godoc
@@ -90,7 +103,7 @@ func (u *userHandler) Login(c *gin.Context) {
 	}
 
 	u.setCookie(c, auth.AccessToken, 0)
-	response.Success(c, "user logged in successfully", auth)
+	response.Success(c, fmt.Sprintf("%s logged in successfully", strings.ToLower(auth.User.Role)), auth)
 }
 
 // Get User godoc
@@ -99,7 +112,7 @@ func (u *userHandler) Login(c *gin.Context) {
 // @Tags	Users
 // @Accept	json
 // @Produce	json
-// @Param	userId	path	string	true	"User id"
+// @Param	userId	path	string	true	"User Id" Format(uuid)
 // @Success	200  {object}  response.SuccessMessage{data=models.User}
 // @Failure	400  {object}  se.ServiceError
 // @Failure	404  {object}  se.ServiceError
@@ -113,7 +126,7 @@ func (u *userHandler) Get(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "user gotten successfully", user)
+	response.Success(c, fmt.Sprintf("%s created successfully", strings.ToLower(user.Role)), user)
 }
 
 // Get User Profile godoc
@@ -135,7 +148,7 @@ func (u *userHandler) GetProfile(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "user gotten successfully", user)
+	response.Success(c, fmt.Sprintf("%s created successfully", strings.ToLower(user.Role)), user)
 }
 
 // Get All User godoc
@@ -157,7 +170,7 @@ func (u *userHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "user gotten successfully", users, len(users))
+	response.Success(c, "users gotten successfully", users, len(users))
 }
 
 // Edit User godoc
@@ -187,7 +200,7 @@ func (u *userHandler) Edit(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "User editted successfully", user)
+	response.Success(c, fmt.Sprintf("%s updated successfully", strings.ToLower(user.Role)), user)
 }
 
 // Delete User godoc
@@ -208,7 +221,7 @@ func (u *userHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	response.Success202(c, "User deleted successfully")
+	response.Success202(c, "user deleted successfully")
 }
 
 // Logout User godoc
@@ -230,7 +243,7 @@ func (u *userHandler) Logout(c *gin.Context) {
 	}
 
 	u.setCookie(c, "", -1)
-	response.Success201(c, "Logged out successfully", nil)
+	response.Success201(c, "logged out successfully", nil)
 }
 
 // Clear Login Auth godoc
@@ -251,11 +264,11 @@ func (u *userHandler) ClearAuth(c *gin.Context) {
 		return
 	}
 
-	response.Success201(c, "Logged out from all other device successfully", nil)
+	response.Success201(c, "logged out from all other device successfully", nil)
 }
 
-func NewUserHandler(userSrv service.UserService) UserHandler {
-	return &userHandler{userSrv: userSrv}
+func NewUserHandler(userSrv service.UserService, cashbin *casbin.Enforcer) UserHandler {
+	return &userHandler{userSrv: userSrv, cashbin: cashbin}
 }
 
 // Auxillary function
@@ -272,4 +285,15 @@ func (u *userHandler) getAuth(c *gin.Context) (auth string) {
 
 	auth = c.GetHeader(defaultCookieName)
 	return
+}
+
+func (u *userHandler) addPolicy(user *models.User) error {
+	if user.Role == "USER" {
+		obj := fmt.Sprintf("%s/%v", utils.UserPath, user.Id)
+		u.cashbin.AddPolicy(user.Id, obj, utils.PolicyMethodGet, utils.PolicyEffectAllow)
+	}
+
+	u.cashbin.AddGroupingPolicy(user.Id, fmt.Sprintf("role::%v", strings.ToLower(user.Role)))
+
+	return u.cashbin.SavePolicy()
 }

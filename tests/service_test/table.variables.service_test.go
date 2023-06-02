@@ -12,6 +12,13 @@ func generateTableForm() *forms.Table {
 	}
 }
 
+func generateEditTableForm() *forms.EditTable {
+	return &forms.EditTable{
+		Booked: true,
+		Seats:  rand.Intn(50) + 1,
+	}
+}
+
 func createAndAddTable(table *forms.Table) *models.Table {
 	if table == nil {
 		table = generateTableForm()

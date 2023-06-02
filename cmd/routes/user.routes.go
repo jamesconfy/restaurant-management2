@@ -5,11 +5,13 @@ import (
 	"restaurant-management/cmd/middleware"
 	"restaurant-management/internal/service"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoute(router *gin.RouterGroup, userSrv service.UserService, jwt middleware.JWT) {
-	handler := handlers.NewUserHandler(userSrv)
+func UserRoute(router *gin.RouterGroup, userSrv service.UserService, authSrv service.AuthService, cashbin *casbin.Enforcer) {
+	handler := handlers.NewUserHandler(userSrv, cashbin)
+	jwt := middleware.Authentication(authSrv, cashbin)
 
 	user := router.Group("/users")
 	user.Use(jwt.CheckJWT())
@@ -21,16 +23,16 @@ func UserRoute(router *gin.RouterGroup, userSrv service.UserService, jwt middlew
 		user.DELETE("/profile", handler.Delete)
 	}
 
-	auth1, auth2 := router.Group("/auth"), router.Group("/auth")
+	auth := router.Group("/auth")
 	{
-		auth1.POST("/register", handler.Create)
-		auth1.POST("/login", handler.Login)
+		auth.POST("/register", handler.Create)
+		auth.POST("/login", handler.Login)
 	}
 
-	auth2.Use(jwt.CheckJWT())
+	auth.Use(jwt.CheckJWT())
 	{
-		auth2.POST("/register/admin", handler.Create)
-		auth2.POST("/logout", handler.Logout)
-		auth2.DELETE("/clear", handler.ClearAuth)
+		auth.POST("/register/admin", handler.Create)
+		auth.POST("/logout", handler.Logout)
+		auth.DELETE("/clear", handler.ClearAuth)
 	}
 }

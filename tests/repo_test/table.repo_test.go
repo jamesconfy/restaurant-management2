@@ -93,6 +93,32 @@ func TestGetAllTable_User(t *testing.T) {
 	}
 }
 
+func TestEditTable(t *testing.T) {
+	table := createAndAddTable(nil)
+
+	tabl := generateTable()
+	tabl.Booked = true
+
+	tests := []struct {
+		name    string
+		id      string
+		table   *models.Table
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "Test with correct details", id: table.Id, table: tabl, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ta.Edit(tt.id, tt.table)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("tableSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestDeleteTable(t *testing.T) {
 	table := createAndAddTable(nil)
 

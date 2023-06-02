@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"restaurant-management/utils"
 	"testing"
 
 	"github.com/go-playground/assert/v2"
@@ -12,7 +13,7 @@ import (
 func TestHome(t *testing.T) {
 	r := setupApp()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/v1", nil)
+	req, _ := http.NewRequest("GET", utils.BasePath, nil)
 
 	r.ServeHTTP(w, req)
 

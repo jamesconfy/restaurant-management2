@@ -2,16 +2,12 @@ package service
 
 import "golang.org/x/crypto/bcrypt"
 
-type CryptoService interface {
-	HashPassword(password string) (string, error)
-	ComparePassword(hashed, plain string) bool
-}
+var Crypto cryptoSrv
 
-type cryptoSrv struct {
-}
+type cryptoSrv struct{}
 
-func (c cryptoSrv) HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+func (c cryptoSrv) hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return "", err
 	}
@@ -19,10 +15,6 @@ func (c cryptoSrv) HashPassword(password string) (string, error) {
 	return string(bytes), nil
 }
 
-func (c cryptoSrv) ComparePassword(hashed, plain string) bool {
+func (c cryptoSrv) comparePassword(hashed, plain string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain)) == nil
-}
-
-func NewCryptoService() CryptoService {
-	return &cryptoSrv{}
 }

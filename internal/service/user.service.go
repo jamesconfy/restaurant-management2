@@ -1,14 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"restaurant-management/internal/forms"
 	"restaurant-management/internal/models"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/se"
-	"strings"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/docker/distribution/uuid"
 )
 
@@ -24,17 +21,14 @@ type UserService interface {
 }
 
 type userSrv struct {
-	userRepo     repo.UserRepo
-	authRepo     repo.AuthRepo
-	validatorSrv ValidationService
-	cryptoSrv    CryptoService
-	authSrv      AuthService
-	emailSrv     EmailService
-	cashbin      *casbin.Enforcer
+	userRepo repo.UserRepo
+	authRepo repo.AuthRepo
+	authSrv  AuthService
+	emailSrv EmailService
 }
 
 func (u *userSrv) Create(req *forms.User) (*models.User, *se.ServiceError) {
-	err := u.validatorSrv.Validate(req)
+	err := Validator.validate(req)
 	if err != nil {
 		return nil, se.Validating(err)
 	}
@@ -47,7 +41,7 @@ func (u *userSrv) Create(req *forms.User) (*models.User, *se.ServiceError) {
 		return nil, se.ConflictOrInternal(err, "phone already taken")
 	}
 
-	password, err := u.cryptoSrv.HashPassword(req.Password)
+	password, err := Crypto.hashPassword(req.Password)
 	if err != nil {
 		return nil, se.Internal(err, "could not hash password")
 	}
@@ -68,19 +62,11 @@ func (u *userSrv) Create(req *forms.User) (*models.User, *se.ServiceError) {
 		return nil, se.Internal(err)
 	}
 
-	defer func() {
-		obj := fmt.Sprintf("/api/v1/users/%v", usr.Id)
-		u.cashbin.AddPolicy(usr.Id, obj, "(GET)|(POST)|(DELETE)|(PATCH)|(PUT)", "allow")
-		u.cashbin.AddGroupingPolicy(usr.Id, fmt.Sprintf("role::%v", strings.ToLower(usr.Role)))
-
-		u.cashbin.SavePolicy()
-	}()
-
 	return usr, nil
 }
 
 func (u *userSrv) Login(req *forms.Login) (*models.Auth, *se.ServiceError) {
-	err := u.validatorSrv.Validate(req)
+	err := Validator.validate(req)
 	if err != nil {
 		return nil, se.Validating(err)
 	}
@@ -90,8 +76,7 @@ func (u *userSrv) Login(req *forms.Login) (*models.Auth, *se.ServiceError) {
 		return nil, se.NotFoundOrInternal(err, "user does not exist")
 	}
 
-	ok := u.cryptoSrv.ComparePassword(user.Password, req.Password)
-	if !ok {
+	if ok := Crypto.comparePassword(user.Password, req.Password); !ok {
 		return nil, se.BadRequest("password does not match")
 	}
 
@@ -109,13 +94,13 @@ func (u *userSrv) Login(req *forms.Login) (*models.Auth, *se.ServiceError) {
 		return nil, se.Internal(err, "Error when adding/updating user token")
 	}
 
+	ath.User = user
 	return ath, nil
 }
 
 func (u *userSrv) Get(userId string) (*models.User, *se.ServiceError) {
-	_, err := uuid.Parse(userId)
-	if err != nil {
-		return nil, se.NotFound("user not found")
+	if _, err := uuid.Parse(userId); err != nil {
+		return nil, se.Internal(err, "invalid user id")
 	}
 
 	user, err := u.userRepo.GetById(userId)
@@ -136,6 +121,16 @@ func (u *userSrv) GetAll() ([]*models.User, *se.ServiceError) {
 }
 
 func (u *userSrv) Edit(userId string, req *forms.EditUser) (*models.User, *se.ServiceError) {
+	err := Validator.validate(req)
+	if err != nil {
+		return nil, se.Validating(err)
+	}
+
+	_, err = uuid.Parse(userId)
+	if err != nil {
+		return nil, se.Internal(err, "invalid user id")
+	}
+
 	user, err := u.userRepo.GetById(userId)
 	if err != nil {
 		return nil, se.NotFoundOrInternal(err, "user not found")
@@ -157,7 +152,7 @@ func (u *userSrv) Edit(userId string, req *forms.EditUser) (*models.User, *se.Se
 func (u *userSrv) Delete(userId string) *se.ServiceError {
 	_, err := uuid.Parse(userId)
 	if err != nil {
-		return se.NotFound("user not found")
+		return se.Internal(err, "invalid user id")
 	}
 
 	err = u.userRepo.Delete(userId)
@@ -169,8 +164,8 @@ func (u *userSrv) Delete(userId string) *se.ServiceError {
 }
 
 func (u *userSrv) DeleteAuth(userId, accessToken string) *se.ServiceError {
-	if _, er := uuid.Parse(userId); er != nil {
-		return se.NotFound("user not found")
+	if _, err := uuid.Parse(userId); err != nil {
+		return se.Internal(err, "invalid user id")
 	}
 
 	err := u.authRepo.Delete(userId, accessToken)
@@ -183,7 +178,7 @@ func (u *userSrv) DeleteAuth(userId, accessToken string) *se.ServiceError {
 
 func (u *userSrv) ClearAuth(userId, accessToken string) *se.ServiceError {
 	if _, er := uuid.Parse(userId); er != nil {
-		return se.NotFound("user not found")
+		return se.Internal(er, "invalide user id")
 	}
 
 	err := u.authRepo.Clear(userId, accessToken)
@@ -194,8 +189,8 @@ func (u *userSrv) ClearAuth(userId, accessToken string) *se.ServiceError {
 	return nil
 }
 
-func NewUserService(repo repo.UserRepo, authRepo repo.AuthRepo, validator ValidationService, cryptoSrv CryptoService, authSrv AuthService, emailSrv EmailService, cashbin *casbin.Enforcer) UserService {
-	return &userSrv{userRepo: repo, authRepo: authRepo, validatorSrv: validator, cryptoSrv: cryptoSrv, authSrv: authSrv, emailSrv: emailSrv, cashbin: cashbin}
+func NewUserService(repo repo.UserRepo, authRepo repo.AuthRepo, authSrv AuthService, emailSrv EmailService) UserService {
+	return &userSrv{userRepo: repo, authRepo: authRepo, authSrv: authSrv, emailSrv: emailSrv}
 }
 
 // Auxillary Functions

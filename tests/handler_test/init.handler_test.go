@@ -7,10 +7,10 @@ import (
 	"log"
 	"time"
 
-	"restaurant-management/cmd/middleware"
 	routes "restaurant-management/cmd/routes"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/service"
+	"restaurant-management/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -25,9 +25,15 @@ import (
 
 var (
 	// Database
-	db       *sql.DB
-	userRepo repo.UserRepo
-	authRepo repo.AuthRepo
+	db        *sql.DB
+	userRepo  repo.UserRepo
+	authRepo  repo.AuthRepo
+	menuRepo  repo.MenuRepo
+	foodRepo  repo.FoodRepo
+	tableRepo repo.TableRepo
+
+	//
+	router *gin.Engine
 
 	// Cashbin
 	cashbin *casbin.Enforcer
@@ -37,9 +43,9 @@ var (
 	emailSrv service.EmailService
 	authSrv  service.AuthService
 	userSrv  service.UserService
-
-	// JWT
-	jwt middleware.JWT
+	menuSrv  service.MenuService
+	foodSrv  service.FoodService
+	tableSrv service.TableService
 )
 
 func init() {
@@ -96,19 +102,23 @@ func init() {
 	// Initialize Repository
 	userRepo = repo.NewUserRepo(db)
 	authRepo = repo.NewAuthRepo(db)
+	menuRepo = repo.NewMenuRepo(db)
+	foodRepo = repo.NewFoodRepo(db)
+	tableRepo = repo.NewTableRepo(db)
 
 	// Initialize Services
-	valiSrv := service.NewValidationService()
-	crySrv := service.NewCryptoService()
 	emailSrv = service.NewEmailService("", "", "", "")
 	authSrv = service.NewAuthService(authRepo, "")
 
 	// Initialize Services
 	homeSrv = service.NewHomeService()
-	userSrv = service.NewUserService(userRepo, authRepo, valiSrv, crySrv, authSrv, emailSrv, cashbin)
+	userSrv = service.NewUserService(userRepo, authRepo, authSrv, emailSrv)
+	menuSrv = service.NewMenuService(menuRepo)
+	foodSrv = service.NewFoodService(foodRepo, menuRepo)
+	tableSrv = service.NewTableService(tableRepo)
 
-	// JWT
-	jwt = middleware.Authentication(authSrv, cashbin)
+	// Router
+	router = setupApp()
 }
 
 func initDBSchema(db *sql.DB) error {
@@ -124,16 +134,26 @@ func initDBSchema(db *sql.DB) error {
 		return err
 	}
 
-	return m.Up()
+	err = m.Up()
+	if err != nil {
+		fmt.Println("Error: ", err)
+		panic(err)
+	}
+
+	return nil
 }
 
 func setupApp() *gin.Engine {
 	router := gin.New()
 	gin.SetMode(gin.ReleaseMode)
-	v1 := router.Group("/api/v1")
+	v1 := router.Group(utils.BasePath)
 
-	routes.UserRoute(v1, userSrv, jwt)
+	routes.UserRoute(v1, userSrv, authSrv, cashbin)
+	routes.MenuRoute(v1, menuSrv, authSrv, cashbin)
+	routes.FoodRoutes(v1, foodSrv, authSrv, cashbin)
+	routes.TableRoute(v1, tableSrv, authSrv, cashbin)
 	routes.HomeRoute(v1, homeSrv)
+	routes.ErrorRoute(router)
 
 	return router
 }

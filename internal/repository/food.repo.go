@@ -10,6 +10,7 @@ type FoodRepo interface {
 	Get(foodId string) (foo *models.Food, err error)
 	GetAll() (foods []*models.Food, err error)
 	Edit(foodId string, food *models.Food) (foo *models.Food, err error)
+	Delete(foodId string) error
 }
 
 type foodRepo struct {
@@ -67,7 +68,7 @@ func (f *foodRepo) GetAll() (foods []*models.Food, err error) {
 func (f *foodRepo) Edit(foodId string, food *models.Food) (foo *models.Food, err error) {
 	foo = new(models.Food)
 
-	query := `UPDATE food SET name = $1, price = $2, image = $3, menu_id = $4 WHERE id = $5 RETURNING id, name, price, image, menu_id, date_created, date_updated`
+	query := `UPDATE food SET name = $1, price = $2, image = $3, menu_id = $4, date_updated = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id, name, price, image, menu_id, date_created, date_updated`
 
 	err = f.conn.QueryRow(query, food.Name, food.Price, food.Image, food.MenuId, foodId).Scan(&foo.Id, &foo.Name, &foo.Price, &foo.Image, &foo.MenuId, &foo.DateCreated, &foo.DateUpdated)
 	if err != nil {
@@ -75,6 +76,18 @@ func (f *foodRepo) Edit(foodId string, food *models.Food) (foo *models.Food, err
 	}
 
 	return
+}
+
+// Delete implements FoodRepo
+func (f *foodRepo) Delete(foodId string) error {
+	query := `DELETE FROM food WHERE id = $1`
+
+	_, err := f.conn.Exec(query, foodId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewFoodRepo(conn *sql.DB) FoodRepo {

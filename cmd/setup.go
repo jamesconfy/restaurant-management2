@@ -9,6 +9,7 @@ import (
 
 	middleware "restaurant-management/cmd/middleware"
 	routes "restaurant-management/cmd/routes"
+	"restaurant-management/config"
 	_ "restaurant-management/docs"
 	sql "restaurant-management/internal/database"
 	"restaurant-management/internal/logger"
@@ -37,7 +38,7 @@ var migrate = flag.String("migrate", "false", "for migrations")
 
 func Setup() {
 	router := gin.New()
-	v1 := router.Group("/api/v1")
+	v1 := router.Group(utils.BasePath)
 	v1.Use(gin.Logger())
 	v1.Use(gin.Recovery())
 	router.Use(middleware.CORS())
@@ -63,34 +64,39 @@ func Setup() {
 	// Table Repository
 	tableRepo := repo.NewTableRepo(conn)
 
+	// Menu Repository
+	menuRepo := repo.NewMenuRepo(conn)
+
+	// Food Repository
+	foodRepo := repo.NewFoodRepo(conn)
+
 	// Email Service
 	emailSrv := service.NewEmailService(email, email_passwd, email_host, email_port)
 
 	// Token Service
 	authSrv := service.NewAuthService(authRepo, secret)
 
-	// Validation Service
-	validatorSrv := service.NewValidationService()
-
-	// Cryptography Service
-	cryptoSrv := service.NewCryptoService()
-
 	// Home Service
 	homeSrv := service.NewHomeService()
 
 	// User Service
-	userSrv := service.NewUserService(userRepo, authRepo, validatorSrv, cryptoSrv, authSrv, emailSrv, cashbin)
+	userSrv := service.NewUserService(userRepo, authRepo, authSrv, emailSrv)
 
 	// Table Service
-	tableSrv := service.NewTableService(tableRepo, validatorSrv, cashbin)
+	tableSrv := service.NewTableService(tableRepo)
 
-	// Middleware
-	jwt := middleware.Authentication(authSrv, cashbin)
+	// Menu Service
+	menuSrv := service.NewMenuService(menuRepo)
+
+	// Food Service
+	foodSrv := service.NewFoodService(foodRepo, menuRepo)
 
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
-	routes.UserRoute(v1, userSrv, jwt)
-	routes.TableRoute(v1, tableSrv, jwt)
+	routes.UserRoute(v1, userSrv, authSrv, cashbin)
+	routes.TableRoute(v1, tableSrv, authSrv, cashbin)
+	routes.MenuRoute(v1, menuSrv, authSrv, cashbin)
+	routes.FoodRoutes(v1, foodSrv, authSrv, cashbin)
 	routes.ErrorRoute(router)
 
 	// Documentation
@@ -101,23 +107,22 @@ func Setup() {
 func init() {
 	flag.Parse()
 
-	addr = utils.AppConfig.ADDR
+	addr = config.Environment.ADDR
 	if addr == "" {
 		addr = "8000"
 	}
 
-	secret = utils.AppConfig.SECRET_KEY_TOKEN
+	secret = config.Environment.SECRET_KEY_TOKEN
 	if secret == "" {
 		log.Println("Please provide a secret key token")
 	}
 
-	mode = utils.AppConfig.MODE
-	if mode == "development" {
-		loadDev()
-	}
-
-	if mode == "production" {
+	mode = config.Environment.MODE
+	switch mode {
+	case "production":
 		loadProd()
+	default:
+		loadDev()
 	}
 
 	if *migrate == "true" {
@@ -130,32 +135,33 @@ func init() {
 func loadDev() {
 	gin.SetMode(gin.DebugMode)
 
-	host := utils.AppConfig.POSTGRES_HOST
-	username := utils.AppConfig.POSTGRES_USERNAME
-	passwd := utils.AppConfig.POSTGRES_PASSWORD
-	dbname := utils.AppConfig.POSTGRES_DBNAME
+	host := config.Environment.POSTGRES_HOST
+	username := config.Environment.POSTGRES_USER
+	passwd := config.Environment.POSTGRES_PASSWORD
+	dbname := config.Environment.POSTGRES_DB
 
 	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, passwd, dbname)
+	fmt.Println("DSN: ", dsn)
 	if dsn == "" {
 		log.Println("DSN cannot be empty")
 	}
 
-	email_host = utils.AppConfig.HOST
+	email_host = config.Environment.HOST
 	if email_host == "" {
 		log.Println("Please provide an email host name")
 	}
 
-	email_port = utils.AppConfig.PORT
+	email_port = config.Environment.PORT
 	if email_port == "" {
 		log.Println("Please provide an email port")
 	}
 
-	email_passwd = utils.AppConfig.PASSWD
+	email_passwd = config.Environment.PASSWD
 	if email_passwd == "" {
 		log.Println("Please provide an email password")
 	}
 
-	email = utils.AppConfig.EMAIL
+	email = config.Environment.EMAIL
 	if email == "" {
 		log.Println("Please provide an email address")
 	}
@@ -166,5 +172,3 @@ func loadProd() {
 	gin.DefaultWriter = io.MultiWriter(os.Stdout, logger.NewLogger())
 	gin.DisableConsoleColor()
 }
-
-var _ = loadProd

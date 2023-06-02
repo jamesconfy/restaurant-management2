@@ -47,4 +47,4 @@ service_test:
 	go test ./tests/service_test
 
 handler_test:
-	go test ./tests/handler_test
+	go test ./tests/handler_test 

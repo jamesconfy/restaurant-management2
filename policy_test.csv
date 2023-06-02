@@ -1,67 +1,105 @@
-p, role::admin, /api/v1*, (GET)|(POST)|(PATCH)|(DELETE), allow
-p, role::user, /api/v1, (GET), allow
-p, role::user, /api/v1/auth/logout, POST, allow
-p, role::user, /api/v1/auth/clear, POST, allow
-p, role::user, /api/v1/users, (GET)|(POST)|(PATCH)|(DELETE), deny
-p, role::user, /api/v1/users/profile, (GET)|(POST)|(PATCH)|(DELETE), allow
-p, role::user, /api/v1/tables*, GET, allow
-p, 90c779d5-8ab9-4bcd-a7c4-276f66e4e791, /api/v1/users/90c779d5-8ab9-4bcd-a7c4-276f66e4e791, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, fad32648-7275-479d-8262-645f48dc7da0, /api/v1/users/fad32648-7275-479d-8262-645f48dc7da0, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, d9edc399-3cc1-4c1a-957c-0ffe4b62e877, /api/v1/users/d9edc399-3cc1-4c1a-957c-0ffe4b62e877, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, fa5cbf7b-6c0a-4273-b79e-20478819ec61, /api/v1/users/fa5cbf7b-6c0a-4273-b79e-20478819ec61, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, ade98d64-1985-4535-a79f-ca4ae9b178b6, /api/v1/users/ade98d64-1985-4535-a79f-ca4ae9b178b6, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, e7399f9d-ca50-4ea6-b080-f1a6f8899644, /api/v1/users/e7399f9d-ca50-4ea6-b080-f1a6f8899644, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 9d6d6136-ce64-45e1-9b04-c7ddf8fbb9bd, /api/v1/users/9d6d6136-ce64-45e1-9b04-c7ddf8fbb9bd, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 3d9a0b70-38cb-4e1e-8c4c-14bc10abf670, /api/v1/users/3d9a0b70-38cb-4e1e-8c4c-14bc10abf670, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 1a8488cb-8469-488a-8293-3cf0dc4ad408, /api/v1/users/1a8488cb-8469-488a-8293-3cf0dc4ad408, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 828372ef-f2ae-426f-901d-88b4094b3061, /api/v1/users/828372ef-f2ae-426f-901d-88b4094b3061, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 3e4333a1-17fb-4a23-b628-c50ab8052e0f, /api/v1/users/3e4333a1-17fb-4a23-b628-c50ab8052e0f, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 97daf9a8-7e4d-4e31-aec0-9f5f0948325a, /api/v1/users/97daf9a8-7e4d-4e31-aec0-9f5f0948325a, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 8f47a98d-db8d-4698-be65-267444b13adc, /api/v1/users/8f47a98d-db8d-4698-be65-267444b13adc, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, aa696fbe-75e1-4713-ad64-dc613ec33f15, /api/v1/users/aa696fbe-75e1-4713-ad64-dc613ec33f15, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 8c287089-98ca-4444-a8aa-2fa89b49f420, /api/v1/users/8c287089-98ca-4444-a8aa-2fa89b49f420, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, c02b0600-b684-4112-997d-ef0d4cc2a2bb, /api/v1/users/c02b0600-b684-4112-997d-ef0d4cc2a2bb, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, e5402214-d0ed-404b-a868-59f0a0261a96, /api/v1/users/e5402214-d0ed-404b-a868-59f0a0261a96, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 75981149-d127-4afc-aea7-64f4fecec356, /api/v1/users/75981149-d127-4afc-aea7-64f4fecec356, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 985220e6-110b-4791-89a5-d2cd5310a0e3, /api/v1/users/985220e6-110b-4791-89a5-d2cd5310a0e3, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 7f243c73-e7d1-49a9-ac2a-5fc5fe41e000, /api/v1/users/7f243c73-e7d1-49a9-ac2a-5fc5fe41e000, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, f32e5927-bb11-4b8f-95c9-aa73ffd26d6b, /api/v1/users/f32e5927-bb11-4b8f-95c9-aa73ffd26d6b, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, fbadff1d-3224-456b-b51e-eb5ff43369e0, /api/v1/users/fbadff1d-3224-456b-b51e-eb5ff43369e0, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 18876060-6ea9-4315-b455-f63cc1c3a296, /api/v1/users/18876060-6ea9-4315-b455-f63cc1c3a296, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 70b1fd77-8261-462e-ae19-60d7cf3c2f88, /api/v1/users/70b1fd77-8261-462e-ae19-60d7cf3c2f88, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 9339e7a1-d0ce-4bed-9f96-eb9a416ad94e, /api/v1/users/9339e7a1-d0ce-4bed-9f96-eb9a416ad94e, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 3cec3cec-fa23-42e3-86bd-293813463a97, /api/v1/users/3cec3cec-fa23-42e3-86bd-293813463a97, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 60bb2ac9-ccb0-4662-aa71-27b8f547a124, /api/v1/users/60bb2ac9-ccb0-4662-aa71-27b8f547a124, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 7812cb18-e884-49d3-a413-0ce1b1cd74ea, /api/v1/users/7812cb18-e884-49d3-a413-0ce1b1cd74ea, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, ff9bc279-6c40-45f5-931d-bea58efcf842, /api/v1/users/ff9bc279-6c40-45f5-931d-bea58efcf842, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-p, 874dbe4b-32b1-409b-9126-d910aba0d8a7, /api/v1/users/874dbe4b-32b1-409b-9126-d910aba0d8a7, (GET)|(POST)|(DELETE)|(PATCH)|(PUT), allow
-g, 90c779d5-8ab9-4bcd-a7c4-276f66e4e791, role::user
-g, fad32648-7275-479d-8262-645f48dc7da0, role::user
-g, d9edc399-3cc1-4c1a-957c-0ffe4b62e877, role::admin
-g, fa5cbf7b-6c0a-4273-b79e-20478819ec61, role::user
-g, ade98d64-1985-4535-a79f-ca4ae9b178b6, role::user
-g, e7399f9d-ca50-4ea6-b080-f1a6f8899644, role::user
-g, 9d6d6136-ce64-45e1-9b04-c7ddf8fbb9bd, role::user
-g, 3d9a0b70-38cb-4e1e-8c4c-14bc10abf670, role::user
-g, 1a8488cb-8469-488a-8293-3cf0dc4ad408, role::user
-g, 828372ef-f2ae-426f-901d-88b4094b3061, role::user
-g, 3e4333a1-17fb-4a23-b628-c50ab8052e0f, role::user
-g, 97daf9a8-7e4d-4e31-aec0-9f5f0948325a, role::user
-g, 8f47a98d-db8d-4698-be65-267444b13adc, role::user
-g, aa696fbe-75e1-4713-ad64-dc613ec33f15, role::user
-g, 8c287089-98ca-4444-a8aa-2fa89b49f420, role::user
-g, c02b0600-b684-4112-997d-ef0d4cc2a2bb, role::user
-g, e5402214-d0ed-404b-a868-59f0a0261a96, role::user
-g, 75981149-d127-4afc-aea7-64f4fecec356, role::admin
-g, 985220e6-110b-4791-89a5-d2cd5310a0e3, role::user
-g, 7f243c73-e7d1-49a9-ac2a-5fc5fe41e000, role::user
-g, f32e5927-bb11-4b8f-95c9-aa73ffd26d6b, role::user
-g, fbadff1d-3224-456b-b51e-eb5ff43369e0, role::user
-g, 18876060-6ea9-4315-b455-f63cc1c3a296, role::user
-g, 70b1fd77-8261-462e-ae19-60d7cf3c2f88, role::user
-g, 9339e7a1-d0ce-4bed-9f96-eb9a416ad94e, role::user
-g, 3cec3cec-fa23-42e3-86bd-293813463a97, role::user
-g, 60bb2ac9-ccb0-4662-aa71-27b8f547a124, role::user
-g, 7812cb18-e884-49d3-a413-0ce1b1cd74ea, role::user
-g, ff9bc279-6c40-45f5-931d-bea58efcf842, role::user
-g, 874dbe4b-32b1-409b-9126-d910aba0d8a7, role::admin
+p, role::admin, /v1*, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, role::user, /v1, (GET), allow
+p, role::user, /v1/auth/logout, POST, allow
+p, role::user, /v1/auth/clear, POST, allow
+p, role::user, /v1/users, (GET)|(POST)|(PATCH)|(DELETE), deny
+p, role::user, /v1/users/profile, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, role::user, /v1/tables*, GET, allow
+p, role::user, /v1/menu*, GET, allow
+p, 0a4dfa83-edf7-46e3-82c1-83a88d7d1d4a, /v1/users/0a4dfa83-edf7-46e3-82c1-83a88d7d1d4a, GET, allow
+p, 5ae36b71-a280-4b34-bae4-5fcb046595dd, /v1/users/5ae36b71-a280-4b34-bae4-5fcb046595dd, GET, allow
+p, 6a177d27-e975-4373-97eb-0d791a3d6494, /v1/users/6a177d27-e975-4373-97eb-0d791a3d6494, GET, allow
+p, 0b22cc6c-5c0a-45f6-9257-6ac8c9426a7c, /v1/users/0b22cc6c-5c0a-45f6-9257-6ac8c9426a7c, GET, allow
+p, 253ef5e7-e70c-4896-aebb-ae89f633fdbd, /v1/users/253ef5e7-e70c-4896-aebb-ae89f633fdbd, GET, allow
+p, 8c1d53db-9970-47ce-9632-2456021ac3ac, /v1/users/8c1d53db-9970-47ce-9632-2456021ac3ac, GET, allow
+p, 6e946153-64cf-4bb1-b514-6c9145176220, /v1/users/6e946153-64cf-4bb1-b514-6c9145176220, GET, allow
+p, 3e5bf7fd-c553-4362-a476-f56cb2d07439, /v1/users/3e5bf7fd-c553-4362-a476-f56cb2d07439, GET, allow
+p, 57ec7a2d-f824-4dfc-9a87-89b24309eba5, /v1/users/57ec7a2d-f824-4dfc-9a87-89b24309eba5, GET, allow
+p, f39413e2-bc4d-4bdd-a1ef-04b7283c621d, /v1/users/f39413e2-bc4d-4bdd-a1ef-04b7283c621d, GET, allow
+p, 4f8133a3-bbb0-4040-a1d2-ed5e115faa9e, /v1/users/4f8133a3-bbb0-4040-a1d2-ed5e115faa9e, GET, allow
+p, 37f5d8d6-a556-4267-9623-c3ee961dda2b, /v1/users/37f5d8d6-a556-4267-9623-c3ee961dda2b, GET, allow
+p, 94f2419a-61a6-4d4b-92d0-a3c12144f875, /v1/users/94f2419a-61a6-4d4b-92d0-a3c12144f875, GET, allow
+p, a5787e7e-bc21-4f7f-93e8-4c8299151f0d, /v1/users/a5787e7e-bc21-4f7f-93e8-4c8299151f0d, GET, allow
+p, 61c9fa79-1eff-4e2d-8696-1165349d7faf, /v1/users/61c9fa79-1eff-4e2d-8696-1165349d7faf, GET, allow
+p, 1debb743-e9c7-42e4-a0a0-e3b685b7d93a, /v1/users/1debb743-e9c7-42e4-a0a0-e3b685b7d93a, GET, allow
+p, 271b2d9b-c10c-4ee2-aaee-b0f027fd70c7, /v1/users/271b2d9b-c10c-4ee2-aaee-b0f027fd70c7, GET, allow
+p, 0679aad3-3230-466e-8fbf-b31a60f6f82c, /v1/users/0679aad3-3230-466e-8fbf-b31a60f6f82c, GET, allow
+p, 9d028bc0-df50-49be-b860-6e3ee2bc8bf8, /v1/users/9d028bc0-df50-49be-b860-6e3ee2bc8bf8, GET, allow
+p, ae65fff4-a77c-41f8-972d-3c392ffc1cc3, /v1/users/ae65fff4-a77c-41f8-972d-3c392ffc1cc3, GET, allow
+p, b5b10c21-fc31-4ae3-a2bd-ea5cd8d7b500, /v1/users/b5b10c21-fc31-4ae3-a2bd-ea5cd8d7b500, GET, allow
+p, e9250978-e0c3-4293-b4a0-0022b9567e70, /v1/users/e9250978-e0c3-4293-b4a0-0022b9567e70, GET, allow
+p, e69102bc-fab9-4e02-9b31-f6d7296d63a4, /v1/users/e69102bc-fab9-4e02-9b31-f6d7296d63a4, GET, allow
+p, 3029eb1d-8707-48d4-b5f9-97ed5824580f, /v1/users/3029eb1d-8707-48d4-b5f9-97ed5824580f, GET, allow
+p, d8476deb-e85f-46a0-94af-bdf4abb93aaa, /v1/users/d8476deb-e85f-46a0-94af-bdf4abb93aaa, GET, allow
+p, ff9d5cae-552a-4d08-a39f-ec558c40ceac, /v1/users/ff9d5cae-552a-4d08-a39f-ec558c40ceac, GET, allow
+p, b95c320e-39ed-4114-a415-b00bcfd07a99, /v1/users/b95c320e-39ed-4114-a415-b00bcfd07a99, GET, allow
+p, ed968c8c-f35c-4698-9920-7ad94eaa00f4, /v1/users/ed968c8c-f35c-4698-9920-7ad94eaa00f4, GET, allow
+p, 55e68256-4f5e-4cf7-9a48-36a3907bd611, /v1/users/55e68256-4f5e-4cf7-9a48-36a3907bd611, GET, allow
+p, 48f587ff-f86d-4ff0-b92c-db62d340d31f, /v1/users/48f587ff-f86d-4ff0-b92c-db62d340d31f, GET, allow
+p, 74ef7b1b-6844-4803-81fb-2ba93aeae55d, /v1/users/74ef7b1b-6844-4803-81fb-2ba93aeae55d, GET, allow
+p, 37288248-1793-4a68-bda6-3385418abbfb, /v1/users/37288248-1793-4a68-bda6-3385418abbfb, GET, allow
+p, 275f0563-a551-4ca0-a533-cd360ac0ae79, /v1/users/275f0563-a551-4ca0-a533-cd360ac0ae79, GET, allow
+p, 99e06442-0102-4046-a067-5447b99773b5, /v1/users/99e06442-0102-4046-a067-5447b99773b5, GET, allow
+p, 851cc4e7-506e-47b7-968f-6661c642bc7a, /v1/users/851cc4e7-506e-47b7-968f-6661c642bc7a, GET, allow
+p, 833de645-310e-4b21-9364-4b44e288498e, /v1/users/833de645-310e-4b21-9364-4b44e288498e, GET, allow
+p, 5dce3150-94ed-4774-93e4-c56fc71275f2, /v1/users/5dce3150-94ed-4774-93e4-c56fc71275f2, GET, allow
+p, cb2dd0ea-f17f-4006-87d4-320e542fe6d0, /v1/users/cb2dd0ea-f17f-4006-87d4-320e542fe6d0, GET, allow
+p, 562dbfac-8826-430e-aae2-bd1ff2b30b4d, /v1/users/562dbfac-8826-430e-aae2-bd1ff2b30b4d, GET, allow
+p, 4a8831ea-cd78-4f01-87ea-3a864d553ed4, /v1/users/4a8831ea-cd78-4f01-87ea-3a864d553ed4, GET, allow
+g, ae22da0d-c0ae-4c22-9f59-5825abc4b013, role::admin
+g, 0a4dfa83-edf7-46e3-82c1-83a88d7d1d4a, role::user
+g, 0e96198d-d52b-4afa-864a-19958deab876, role::admin
+g, 5ae36b71-a280-4b34-bae4-5fcb046595dd, role::user
+g, a78a612d-45cc-4916-ba7a-4f8612207e19, role::admin
+g, 6a177d27-e975-4373-97eb-0d791a3d6494, role::user
+g, 7e0555ce-419d-497e-9a72-e7ba285a0b87, role::admin
+g, 0b22cc6c-5c0a-45f6-9257-6ac8c9426a7c, role::user
+g, cb782c1b-e941-432e-9eee-2f3cd3bdb701, role::admin
+g, 253ef5e7-e70c-4896-aebb-ae89f633fdbd, role::user
+g, 28f2c9c2-59f0-4f0a-9d3f-198a5db6ed50, role::admin
+g, 8c1d53db-9970-47ce-9632-2456021ac3ac, role::user
+g, 43df4bf7-eab0-4d54-be8d-033e8992083b, role::admin
+g, 6e946153-64cf-4bb1-b514-6c9145176220, role::user
+g, 38a08162-51ac-47d4-a526-7c8b817ddd08, role::admin
+g, 6e185db5-48ab-4633-93ca-f8c904feb057, role::admin
+g, 3e5bf7fd-c553-4362-a476-f56cb2d07439, role::user
+g, 57ec7a2d-f824-4dfc-9a87-89b24309eba5, role::user
+g, 787b7633-d1b1-4509-8bc5-90204775331d, role::admin
+g, f39413e2-bc4d-4bdd-a1ef-04b7283c621d, role::user
+g, 7fb79128-dbdd-40e1-bd61-7ef39cf11d41, role::admin
+g, 4f8133a3-bbb0-4040-a1d2-ed5e115faa9e, role::user
+g, 37f5d8d6-a556-4267-9623-c3ee961dda2b, role::user
+g, 63fd5ab8-5530-4a04-8468-5e93c751b5d5, role::admin
+g, 94f2419a-61a6-4d4b-92d0-a3c12144f875, role::user
+g, a5787e7e-bc21-4f7f-93e8-4c8299151f0d, role::user
+g, 61c9fa79-1eff-4e2d-8696-1165349d7faf, role::user
+g, 1debb743-e9c7-42e4-a0a0-e3b685b7d93a, role::user
+g, 02bbedb9-49de-47c3-bd31-f05603bfb56a, role::admin
+g, 271b2d9b-c10c-4ee2-aaee-b0f027fd70c7, role::user
+g, 0679aad3-3230-466e-8fbf-b31a60f6f82c, role::user
+g, 9d028bc0-df50-49be-b860-6e3ee2bc8bf8, role::user
+g, ae65fff4-a77c-41f8-972d-3c392ffc1cc3, role::user
+g, b5b10c21-fc31-4ae3-a2bd-ea5cd8d7b500, role::user
+g, e9250978-e0c3-4293-b4a0-0022b9567e70, role::user
+g, e69102bc-fab9-4e02-9b31-f6d7296d63a4, role::user
+g, 3029eb1d-8707-48d4-b5f9-97ed5824580f, role::user
+g, d8476deb-e85f-46a0-94af-bdf4abb93aaa, role::user
+g, ff9d5cae-552a-4d08-a39f-ec558c40ceac, role::user
+g, b95c320e-39ed-4114-a415-b00bcfd07a99, role::user
+g, 7823ac53-9282-46e0-abf7-e3d1b4c13397, role::admin
+g, ed968c8c-f35c-4698-9920-7ad94eaa00f4, role::user
+g, 55e68256-4f5e-4cf7-9a48-36a3907bd611, role::user
+g, 48f587ff-f86d-4ff0-b92c-db62d340d31f, role::user
+g, 74ef7b1b-6844-4803-81fb-2ba93aeae55d, role::user
+g, 37288248-1793-4a68-bda6-3385418abbfb, role::user
+g, 275f0563-a551-4ca0-a533-cd360ac0ae79, role::user
+g, 99e06442-0102-4046-a067-5447b99773b5, role::user
+g, 851cc4e7-506e-47b7-968f-6661c642bc7a, role::user
+g, 833de645-310e-4b21-9364-4b44e288498e, role::user
+g, 5dce3150-94ed-4774-93e4-c56fc71275f2, role::user
+g, cb2dd0ea-f17f-4006-87d4-320e542fe6d0, role::user
+g, f9d2f634-f27c-487f-a854-9ac46580cd2b, role::admin
+g, 562dbfac-8826-430e-aae2-bd1ff2b30b4d, role::user
+g, 78992904-7a93-4586-9971-6d1794b1612a, role::admin
+g, 4a8831ea-cd78-4f01-87ea-3a864d553ed4, role::user
+g, fa39f8d6-704d-438c-a055-988ba250340c, role::admin

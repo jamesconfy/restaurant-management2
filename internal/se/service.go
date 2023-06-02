@@ -85,7 +85,7 @@ func NotFoundOrInternal(err error, descriptions ...string) *ServiceError {
 		description = descriptions[0]
 	}
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, sql.ErrNoRows) || errors.Is(err, nil):
 		return NotFound(description)
 	default:
 		return Internal(err)
