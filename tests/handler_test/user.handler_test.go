@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"restaurant-management/cmd/handlers"
+	"restaurant-management/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,7 +23,7 @@ func TestCreateUser(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.AuthPath, "register")
+	url := fmt.Sprintf("%v/%v", utils.AuthPath, "register")
 
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(obj))
 	req.Header.Set("Content-type", "application/json")
@@ -53,7 +53,7 @@ func TestCreateAdmin(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.AuthPath, "register/admin")
+	url := fmt.Sprintf("%v/%v", utils.AuthPath, "register/admin")
 
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -81,7 +81,7 @@ func TestLoginUser(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.AuthPath, "login")
+	url := fmt.Sprintf("%v/%v", utils.AuthPath, "login")
 
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(obj))
 	req.Header.Set("Content-type", "application/json")
@@ -106,7 +106,7 @@ func TestGetUser_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, user1.Id)
+	url := fmt.Sprintf("%v/%v", utils.UserPath, user1.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -132,7 +132,7 @@ func TestGetProfile_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, "profile")
+	url := fmt.Sprintf("%v/%v", utils.UserPath, "profile")
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -158,7 +158,7 @@ func TestGetProfile_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, "profile")
+	url := fmt.Sprintf("%v/%v", utils.UserPath, "profile")
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -187,7 +187,7 @@ func TestGetAllUsers_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	req, _ := http.NewRequest("GET", handlers.UserPath, nil)
+	req, _ := http.NewRequest("GET", utils.UserPath, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -212,7 +212,7 @@ func TestGetUser_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, user.Id)
+	url := fmt.Sprintf("%v/%v", utils.UserPath, user.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -241,7 +241,7 @@ func TestGetAllUsers_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	req, _ := http.NewRequest("GET", handlers.UserPath, nil)
+	req, _ := http.NewRequest("GET", utils.UserPath, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -270,7 +270,7 @@ func TestEditUser_User(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, "profile")
+	url := fmt.Sprintf("%v/%v", utils.UserPath, "profile")
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -301,7 +301,7 @@ func TestEditUser_Admin(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, "profile")
+	url := fmt.Sprintf("%v/%v", utils.UserPath, "profile")
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -326,7 +326,7 @@ func TestDeleteUser_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, "profile")
+	url := fmt.Sprintf("%v/%v", utils.UserPath, "profile")
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -351,7 +351,7 @@ func TestDeleteUser_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.UserPath, "profile")
+	url := fmt.Sprintf("%v/%v", utils.UserPath, "profile")
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")

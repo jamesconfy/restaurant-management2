@@ -10,6 +10,7 @@ import (
 	routes "restaurant-management/cmd/routes"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/service"
+	"restaurant-management/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -145,7 +146,7 @@ func initDBSchema(db *sql.DB) error {
 func setupApp() *gin.Engine {
 	router := gin.New()
 	gin.SetMode(gin.ReleaseMode)
-	v1 := router.Group("/api/v1")
+	v1 := router.Group(utils.BasePath)
 
 	routes.UserRoute(v1, userSrv, authSrv, cashbin)
 	routes.MenuRoute(v1, menuSrv, authSrv, cashbin)

@@ -38,7 +38,7 @@ var migrate = flag.String("migrate", "false", "for migrations")
 
 func Setup() {
 	router := gin.New()
-	v1 := router.Group("/api/v1")
+	v1 := router.Group(utils.BasePath)
 	v1.Use(gin.Logger())
 	v1.Use(gin.Recovery())
 	router.Use(middleware.CORS())

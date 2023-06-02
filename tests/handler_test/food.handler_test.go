@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"restaurant-management/cmd/handlers"
+	"restaurant-management/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,7 +28,7 @@ func TestAddFood_Admin(t *testing.T) {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", handlers.FoodPath, bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", utils.FoodPath, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -57,7 +57,7 @@ func TestAddFood_User(t *testing.T) {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", handlers.FoodPath, bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", utils.FoodPath, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -76,7 +76,7 @@ func TestGetFood(t *testing.T) {
 
 	food := createAndAddFood(nil, nil)
 
-	url := fmt.Sprintf("%v/%v", handlers.FoodPath, food.Id)
+	url := fmt.Sprintf("%v/%v", utils.FoodPath, food.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -98,7 +98,7 @@ func TestGetAllFood(t *testing.T) {
 		_ = createAndAddFood(nil, nil)
 	}
 
-	req, _ := http.NewRequest("GET", handlers.FoodPath, nil)
+	req, _ := http.NewRequest("GET", utils.FoodPath, nil)
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(w, req)
@@ -129,7 +129,7 @@ func TestEditFood_Admin(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.FoodPath, food.Id)
+	url := fmt.Sprintf("%v/%v", utils.FoodPath, food.Id)
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -163,7 +163,7 @@ func TestEditFood_User(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.FoodPath, food.Id)
+	url := fmt.Sprintf("%v/%v", utils.FoodPath, food.Id)
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -191,7 +191,7 @@ func TestDeleteFood_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.FoodPath, food.Id)
+	url := fmt.Sprintf("%v/%v", utils.FoodPath, food.Id)
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -219,7 +219,7 @@ func TestDeleteFood_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.FoodPath, food.Id)
+	url := fmt.Sprintf("%v/%v", utils.FoodPath, food.Id)
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")

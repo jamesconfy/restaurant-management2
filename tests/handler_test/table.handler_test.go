@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"restaurant-management/cmd/handlers"
+	"restaurant-management/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,7 +28,7 @@ func TestAddTable_Admin(t *testing.T) {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", handlers.TablePath, bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", utils.TablePath, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -57,7 +57,7 @@ func TestAddTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", handlers.TablePath, bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", utils.TablePath, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -81,7 +81,7 @@ func TestGetTable_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -110,7 +110,7 @@ func TestGetAllTable_Admin(t *testing.T) {
 		_ = createAndAddTable(nil)
 	}
 
-	req, _ := http.NewRequest("GET", handlers.TablePath, nil)
+	req, _ := http.NewRequest("GET", utils.TablePath, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -134,7 +134,7 @@ func TestGetTable_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -163,7 +163,7 @@ func TestGetAllTable_User(t *testing.T) {
 		_ = createAndAddTable(nil)
 	}
 
-	req, _ := http.NewRequest("GET", handlers.TablePath, nil)
+	req, _ := http.NewRequest("GET", utils.TablePath, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -194,7 +194,7 @@ func TestEditTable_Admin(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.TablePath, tabl.Id)
+	url := fmt.Sprintf("%v/%v", utils.TablePath, tabl.Id)
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -227,7 +227,7 @@ func TestEditTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", handlers.TablePath, tabl.Id)
+	url := fmt.Sprintf("%v/%v", utils.TablePath, tabl.Id)
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -253,7 +253,7 @@ func TestDeleteTable_Admin(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -279,7 +279,7 @@ func TestDeleteTable_User(t *testing.T) {
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", handlers.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")

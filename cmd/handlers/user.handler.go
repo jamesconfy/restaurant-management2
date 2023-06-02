@@ -7,6 +7,7 @@ import (
 	"restaurant-management/internal/response"
 	"restaurant-management/internal/se"
 	"restaurant-management/internal/service"
+	"restaurant-management/utils"
 	"strings"
 
 	"github.com/casbin/casbin/v2"
@@ -288,8 +289,8 @@ func (u *userHandler) getAuth(c *gin.Context) (auth string) {
 
 func (u *userHandler) addPolicy(user *models.User) error {
 	if user.Role == "USER" {
-		obj := fmt.Sprintf("%s/%v", UserPath, user.Id)
-		u.cashbin.AddPolicy(user.Id, obj, PolicyMethodGet, PolicyEffectAllow)
+		obj := fmt.Sprintf("%s/%v", utils.UserPath, user.Id)
+		u.cashbin.AddPolicy(user.Id, obj, utils.PolicyMethodGet, utils.PolicyEffectAllow)
 	}
 
 	u.cashbin.AddGroupingPolicy(user.Id, fmt.Sprintf("role::%v", strings.ToLower(user.Role)))

@@ -15,9 +15,9 @@ func main() {
 	// @license.name  Apache 2.0
 	// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-	// @host      localhost:8080
+	// @host      localhost:80
 	// @schemes http https
-	// @BasePath  /api/v1
+	// @BasePath  /v1
 
 	// @securityDefinitions.apiKey  ApiKeyAuth
 	// @in header

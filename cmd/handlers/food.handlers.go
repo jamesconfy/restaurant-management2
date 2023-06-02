@@ -141,6 +141,8 @@ func (f *foodHandler) Get(c *gin.Context) {
 // @Failure	500  {object}  se.ServiceError
 // @Router	/foods [get]
 func (f *foodHandler) GetAll(c *gin.Context) {
+	
+
 	foods, err := f.foodSrv.GetAll()
 	if err != nil {
 		response.Error(c, *err)

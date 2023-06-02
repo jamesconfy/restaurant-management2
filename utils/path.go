@@ -1,12 +1,12 @@
-package handlers
+package utils
 
 const (
-	BasePath  = "/api/v1"
-	AuthPath  = "/api/v1/auth"
-	UserPath  = "/api/v1/users"
-	TablePath = "/api/v1/tables"
-	MenuPath  = "/api/v1/menus"
-	FoodPath  = "/api/v1/foods"
+	BasePath  = "/v1"
+	AuthPath  = "/v1/auth"
+	UserPath  = "/v1/users"
+	TablePath = "/v1/tables"
+	MenuPath  = "/v1/menus"
+	FoodPath  = "/v1/foods"
 
 	PolicyMethodGet    = "GET"
 	PolicyMethodPost   = "POST"

@@ -753,7 +753,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.Menu"
+                                            "$ref": "#/definitions/models.MenuFood"
                                         }
                                     }
                                 }
@@ -1746,6 +1746,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MenuFood": {
+            "type": "object",
+            "properties": {
+                "foods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Food"
+                    }
+                },
+                "menu": {
+                    "$ref": "#/definitions/models.Menu"
+                }
+            }
+        },
         "models.Table": {
             "type": "object",
             "properties": {
@@ -1873,8 +1887,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	Host:             "localhost:80",
+	BasePath:         "/v1",
 	Schemes:          []string{"http", "https"},
 	Title:            "Project",
 	Description:      "Server for {{your server link}}",

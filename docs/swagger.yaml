@@ -1,4 +1,4 @@
-basePath: /api/v1
+basePath: /v1
 definitions:
   forms.EditFood:
     properties:
@@ -144,6 +144,15 @@ definitions:
       name:
         type: string
     type: object
+  models.MenuFood:
+    properties:
+      foods:
+        items:
+          $ref: '#/definitions/models.Food'
+        type: array
+      menu:
+        $ref: '#/definitions/models.Menu'
+    type: object
   models.Table:
     properties:
       booked:
@@ -221,7 +230,7 @@ definitions:
       type:
         type: integer
     type: object
-host: localhost:8080
+host: localhost:80
 info:
   contact:
     email: bobdence@gmail.com
@@ -719,7 +728,7 @@ paths:
             - $ref: '#/definitions/response.SuccessMessage'
             - properties:
                 data:
-                  $ref: '#/definitions/models.Menu'
+                  $ref: '#/definitions/models.MenuFood'
               type: object
         "400":
           description: Bad Request

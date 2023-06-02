@@ -2,9 +2,9 @@ package handler_test
 
 import (
 	"fmt"
-	"restaurant-management/cmd/handlers"
 	"restaurant-management/internal/forms"
 	"restaurant-management/internal/models"
+	"restaurant-management/utils"
 	"strings"
 
 	"github.com/bxcodec/faker/v4"
@@ -46,8 +46,8 @@ func createAndRegisterUser(user *forms.User) *models.User {
 	}
 
 	if resultUser.Role == "USER" {
-		obj := fmt.Sprintf("%s/%v", handlers.UserPath, resultUser.Id)
-		cashbin.AddPolicy(resultUser.Id, obj, handlers.PolicyMethodGet, handlers.PolicyEffectAllow)
+		obj := fmt.Sprintf("%s/%v", utils.UserPath, resultUser.Id)
+		cashbin.AddPolicy(resultUser.Id, obj, utils.PolicyMethodGet, utils.PolicyEffectAllow)
 	}
 
 	cashbin.AddGroupingPolicy(resultUser.Id, fmt.Sprintf("role::%v", strings.ToLower(resultUser.Role)))
