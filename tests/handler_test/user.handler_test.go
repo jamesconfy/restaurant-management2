@@ -198,7 +198,7 @@ func TestGetAllUsers_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
 func TestGetUser_Admin(t *testing.T) {

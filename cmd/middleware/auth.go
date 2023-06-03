@@ -2,7 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"net/http"
+	"restaurant-management/internal/response"
+	"restaurant-management/internal/se"
 	"restaurant-management/internal/service"
 	"strings"
 
@@ -23,13 +24,13 @@ func (a *authMiddleWare) CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authToken := a.getAuthorizationHeader(c)
 		if authToken == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid Authorization Token: Token cannot be empty"})
+			response.Error(c, *se.Unauthorized(nil, "token cannot be empty"))
 			return
 		}
 
 		token, err := a.authSrv.Validate(authToken)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": fmt.Sprintf("Invalid Authorization Token: %v", err)})
+			response.Error(c, *se.Unauthorized(err, "invalid authorization token"))
 			return
 		}
 
@@ -82,12 +83,19 @@ func (a *authMiddleWare) enforce(sub string, obj string, act string) (bool, erro
 func (a *authMiddleWare) checkPolicy(c *gin.Context, token *service.Token) {
 	ok, err := a.enforce(token.Id, c.Request.URL.Path, c.Request.Method)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Error when enforcing role base action: %v", err)})
+		response.Error(c, *se.Internal(err, "Error when enforcing role based action"))
 		return
 	}
 
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "You are not authorized to edit this resource"})
+		method := c.Request.Method
+		description := "you are not authorized to change this resource"
+
+		if method == "GET" {
+			description = "you are not authorzied to view this resource"
+		}
+
+		response.Error(c, *se.Forbidden(description))
 		return
 	}
 }

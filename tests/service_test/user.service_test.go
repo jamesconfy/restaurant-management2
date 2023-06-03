@@ -19,9 +19,9 @@ func TestAddUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := userSrv.Create(tt.user)
+			_, err := userSrv.Add(tt.user)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("userSrv.Create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("userSrv.Add() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

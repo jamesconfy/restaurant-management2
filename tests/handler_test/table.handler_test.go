@@ -68,7 +68,7 @@ func TestAddTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
 func TestGetTable_Admin(t *testing.T) {
@@ -240,7 +240,7 @@ func TestEditTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
 func TestDeleteTable_Admin(t *testing.T) {
@@ -292,5 +292,5 @@ func TestDeleteTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }

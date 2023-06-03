@@ -15,6 +15,7 @@ const (
 	ErrServer
 	ErrBadRequest
 	ErrForbidden
+	ErrUnauthorized
 )
 
 func (t Type) String() string {
@@ -29,6 +30,8 @@ func (t Type) String() string {
 		return "BadRequest"
 	case ErrForbidden:
 		return "Forbidden"
+	case ErrUnauthorized:
+		return "Unauthorized"
 	default:
 		return "Unknown"
 
@@ -65,6 +68,16 @@ func Validating(err error) *ServiceError {
 
 func Forbidden(description string) *ServiceError {
 	return New(description, errors.New("forbidden"), ErrForbidden)
+}
+
+func Unauthorized(err error, descriptions ...string) *ServiceError {
+	description := "unauthorized"
+	if len(descriptions) > 0 {
+		description = descriptions[0]
+	}
+
+	return New(description, err, ErrUnauthorized)
+	// return New(description, err, ErrUnauthorized)
 }
 
 func Conflict(description string) *ServiceError {

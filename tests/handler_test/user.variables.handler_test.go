@@ -40,7 +40,7 @@ func createAndRegisterUser(user *forms.User) *models.User {
 		user = generateUserForm()
 	}
 
-	resultUser, err := userSrv.Create(user)
+	resultUser, err := userSrv.Add(user)
 	if err != nil {
 		panic(err)
 	}

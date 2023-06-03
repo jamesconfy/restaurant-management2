@@ -68,7 +68,7 @@ func TestAddMenu_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
 func TestGetMenu(t *testing.T) {
@@ -174,7 +174,7 @@ func TestEditMenu_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
 func TestDeleteMenu_Admin(t *testing.T) {
@@ -226,5 +226,5 @@ func TestDeleteMenu_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }

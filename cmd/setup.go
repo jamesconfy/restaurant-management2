@@ -11,7 +11,7 @@ import (
 	routes "restaurant-management/cmd/routes"
 	"restaurant-management/config"
 	_ "restaurant-management/docs"
-	sql "restaurant-management/internal/database"
+	"restaurant-management/internal/database"
 	"restaurant-management/internal/logger"
 	repo "restaurant-management/internal/repository"
 	service "restaurant-management/internal/service"
@@ -24,14 +24,11 @@ import (
 )
 
 var (
-	addr         string
-	mode         string
-	dsn          string
-	secret       string
-	email        string
-	email_passwd string
-	email_host   string
-	email_port   string
+	addr, mode, dsn, secret                       string
+	cache                                         bool
+	host, username, passwd, dbname                string
+	email, email_passwd, email_host, email_port   string
+	redis_username, redis_password, redis_address string
 )
 
 var migrate = flag.String("migrate", "false", "for migrations")
@@ -43,7 +40,7 @@ func Setup() {
 	v1.Use(gin.Recovery())
 	router.Use(middleware.CORS())
 
-	db, err := sql.New(dsn)
+	db, err := database.New(dsn)
 	if err != nil {
 		log.Println("Error Connecting to DB: ", err)
 	}
@@ -54,6 +51,14 @@ func Setup() {
 	if err != nil {
 		log.Println("Cashbin: ", err)
 	}
+
+	rdb := database.NewRedisDB(redis_username, redis_password, redis_address)
+	if rdb == nil {
+		log.Println("Redis is nil, which should not be so")
+	}
+
+	// Cache Repo
+	cacheRepo := repo.NewRedisCache(rdb)
 
 	// Auth Repository
 	authRepo := repo.NewAuthRepo(conn)
@@ -91,6 +96,11 @@ func Setup() {
 	// Food Service
 	foodSrv := service.NewFoodService(foodRepo, menuRepo)
 
+	if cache && rdb != nil {
+		userSrv = service.NewCachedUserService(userSrv, cacheRepo)
+		authSrv = service.NewCachedAuthService(authSrv, cacheRepo)
+	}
+
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
 	routes.UserRoute(v1, userSrv, authSrv, cashbin)
@@ -112,33 +122,30 @@ func init() {
 		addr = "8000"
 	}
 
+	cache = config.Environment.CACHE
+
 	secret = config.Environment.SECRET_KEY_TOKEN
 	if secret == "" {
 		log.Println("Please provide a secret key token")
 	}
 
-	mode = config.Environment.MODE
-	switch mode {
-	case "production":
-		loadProd()
-	default:
-		loadDev()
+	redis_username = config.Environment.REDIS_USERNAME
+	if redis_username == "" {
+		log.Println("REDIS USERNAME cannot be empty")
+	}
+	redis_password = config.Environment.REDIS_PASSWORD
+	if redis_password == "" {
+		log.Println("REDIS PASSWORD cannot be empty")
+	}
+	redis_address = config.Environment.REDIS_ADDRESS
+	if redis_address == "" {
+		log.Println("REDIS ADDRESS cannot be empty")
 	}
 
-	if *migrate == "true" {
-		if err := utils.Migration(dsn); err != nil {
-			log.Println(err)
-		}
-	}
-}
-
-func loadDev() {
-	gin.SetMode(gin.DebugMode)
-
-	host := config.Environment.POSTGRES_HOST
-	username := config.Environment.POSTGRES_USER
-	passwd := config.Environment.POSTGRES_PASSWORD
-	dbname := config.Environment.POSTGRES_DB
+	host = config.Environment.POSTGRES_HOST
+	username = config.Environment.POSTGRES_USER
+	passwd = config.Environment.POSTGRES_PASSWORD
+	dbname = config.Environment.POSTGRES_DB
 
 	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, passwd, dbname)
 	fmt.Println("DSN: ", dsn)
@@ -165,6 +172,24 @@ func loadDev() {
 	if email == "" {
 		log.Println("Please provide an email address")
 	}
+
+	mode = config.Environment.MODE
+	switch mode {
+	case "production":
+		loadProd()
+	default:
+		loadDev()
+	}
+
+	if *migrate == "true" {
+		if err := utils.Migration(dsn); err != nil {
+			log.Println(err)
+		}
+	}
+}
+
+func loadDev() {
+	gin.SetMode(gin.DebugMode)
 }
 
 func loadProd() {
