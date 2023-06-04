@@ -99,6 +99,9 @@ func Setup() {
 	if cache && rdb != nil {
 		userSrv = service.NewCachedUserService(userSrv, cacheRepo)
 		authSrv = service.NewCachedAuthService(authSrv, cacheRepo)
+		menuSrv = service.NewCachedMenuService(menuSrv, cacheRepo)
+		tableSrv = service.NewCachedTableService(tableSrv, cacheRepo)
+		foodSrv = service.NewCachedFoodService(foodSrv, cacheRepo)
 	}
 
 	// Routes
