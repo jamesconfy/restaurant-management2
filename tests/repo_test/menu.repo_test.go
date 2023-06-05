@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCheckNameAndCategory(t *testing.T) {
+func TestNameAndCategory(t *testing.T) {
 	menu := createAndAddMenu(nil)
 
 	tests := []struct {
@@ -32,7 +32,7 @@ func TestCheckNameAndCategory(t *testing.T) {
 	}
 }
 
-func TestCheckMenuExists(t *testing.T) {
+func TestMenuExists(t *testing.T) {
 	menu := createAndAddMenu(nil)
 
 	tests := []struct {
@@ -46,7 +46,7 @@ func TestCheckMenuExists(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ok, err := m.CheckMenuExists(tt.id)
+			ok, err := m.MenuExists(tt.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.CheckMenuExists() error = %v, wantErr %v", err, tt.wantErr)
 			}

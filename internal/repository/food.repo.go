@@ -6,6 +6,8 @@ import (
 )
 
 type FoodRepo interface {
+	FoodExists(foodId string) (bool, error)
+
 	Add(food *models.Food) (foo *models.Food, err error)
 	Get(foodId string) (foo *models.Food, err error)
 	GetAll() (foods []*models.Food, err error)
@@ -15,6 +17,25 @@ type FoodRepo interface {
 
 type foodRepo struct {
 	conn *sql.DB
+}
+
+func (f *foodRepo) FoodExists(foodId string) (bool, error) {
+	var name string
+
+	query := `SELECT name FROM food WHERE id = $1`
+
+	err := f.conn.QueryRow(query, foodId).Scan(&name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Food does not exist
+			return false, nil
+		}
+		// An error occurred while executing the query
+		return true, err
+	}
+
+	// Food already exists
+	return true, nil
 }
 
 func (f *foodRepo) Add(food *models.Food) (foo *models.Food, err error) {

@@ -120,35 +120,28 @@ func Setup() {
 func init() {
 	flag.Parse()
 
-	addr = config.Environment.ADDR
+	// Initiazlize Configs
+	initValues()
+
 	if addr == "" {
 		addr = "8000"
 	}
 
-	cache = config.Environment.CACHE
-
-	secret = config.Environment.SECRET_KEY_TOKEN
 	if secret == "" {
 		log.Println("Please provide a secret key token")
 	}
 
-	redis_username = config.Environment.REDIS_USERNAME
 	if redis_username == "" {
 		log.Println("REDIS USERNAME cannot be empty")
 	}
-	redis_password = config.Environment.REDIS_PASSWORD
+
 	if redis_password == "" {
 		log.Println("REDIS PASSWORD cannot be empty")
 	}
-	redis_address = config.Environment.REDIS_ADDRESS
+
 	if redis_address == "" {
 		log.Println("REDIS ADDRESS cannot be empty")
 	}
-
-	host = config.Environment.POSTGRES_HOST
-	username = config.Environment.POSTGRES_USER
-	passwd = config.Environment.POSTGRES_PASSWORD
-	dbname = config.Environment.POSTGRES_DB
 
 	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, passwd, dbname)
 	fmt.Println("DSN: ", dsn)
@@ -156,27 +149,22 @@ func init() {
 		log.Println("DSN cannot be empty")
 	}
 
-	email_host = config.Environment.HOST
 	if email_host == "" {
 		log.Println("Please provide an email host name")
 	}
 
-	email_port = config.Environment.PORT
 	if email_port == "" {
 		log.Println("Please provide an email port")
 	}
 
-	email_passwd = config.Environment.PASSWD
 	if email_passwd == "" {
 		log.Println("Please provide an email password")
 	}
 
-	email = config.Environment.EMAIL
 	if email == "" {
 		log.Println("Please provide an email address")
 	}
 
-	mode = config.Environment.MODE
 	switch mode {
 	case "production":
 		loadProd()
@@ -189,6 +177,24 @@ func init() {
 			log.Println(err)
 		}
 	}
+}
+
+func initValues() {
+	addr = config.Environment.ADDR
+	cache = config.Environment.CACHE
+	secret = config.Environment.SECRET_KEY_TOKEN
+	redis_username = config.Environment.REDIS_USERNAME
+	redis_password = config.Environment.REDIS_PASSWORD
+	redis_address = config.Environment.REDIS_ADDRESS
+	host = config.Environment.POSTGRES_HOST
+	username = config.Environment.POSTGRES_USER
+	passwd = config.Environment.POSTGRES_PASSWORD
+	dbname = config.Environment.POSTGRES_DB
+	email_host = config.Environment.HOST
+	email_port = config.Environment.PORT
+	email_passwd = config.Environment.PASSWD
+	email = config.Environment.EMAIL
+	mode = config.Environment.MODE
 }
 
 func loadDev() {

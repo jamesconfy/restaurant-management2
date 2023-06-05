@@ -9,15 +9,9 @@ type User struct {
 	PhoneNumber string    `json:"phone_number"`
 	Email       string    `json:"email"`
 	Role        string    `json:"role"`
-	Password    string    `json:"password"`
+	Password    string    `json:"-"`
 	Address     string    `json:"address"`
 	Avatar      string    `json:"avatar"`
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
-
-// type Role string
-
-// func (r *Role) Access() bool {
-// 	return *r != "USER"
-// }

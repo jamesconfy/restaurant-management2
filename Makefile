@@ -29,10 +29,10 @@ launch:
 	flyctl launch
 
 docker_init:
-	docker build -t everybody8/restaurant-management-api:v$(version) .
+	docker build -t everybody8/restaurant-management:v$(version) .
 
 docker_push:
-	docker push everybody8/restaurant-management-api:v$(version)
+	docker push everybody8/restaurant-management:v$(version)
 
 deploy:
 	flyctl deploy

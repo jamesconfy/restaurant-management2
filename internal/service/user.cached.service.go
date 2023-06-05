@@ -6,6 +6,7 @@ import (
 	"restaurant-management/internal/models"
 	repo "restaurant-management/internal/repository"
 	"restaurant-management/internal/se"
+	"restaurant-management/utils"
 )
 
 type cachedUserService struct {
@@ -14,35 +15,50 @@ type cachedUserService struct {
 }
 
 // Add implements UserService
-func (cu *cachedUserService) Add(req *forms.User) (*models.User, *se.ServiceError) {
-	cu.cache.DeleteByTag("users:all")
-	return cu.userService.Add(req)
+func (cu *cachedUserService) Add(req *forms.User) (user *models.User, err *se.ServiceError) {
+	user, err = cu.userService.Add(req)
+	if err == nil {
+		cu.cache.DeleteByTag(utils.UsersTag)
+	}
+
+	return
 }
 
 // Delete implements UserService
-func (cu *cachedUserService) Delete(userId string) *se.ServiceError {
-	cu.cache.DeleteByTag("users:all", userId)
-	return cu.userService.Delete(userId)
+func (cu *cachedUserService) Delete(userId string) (err *se.ServiceError) {
+	err = cu.userService.Delete(userId)
+	if err == nil {
+		cu.cache.DeleteByTag(utils.UsersTag, userId)
+	}
+
+	return
 }
 
 // DeleteToken implements UserService
-func (cu *cachedUserService) DeleteAuth(userId, accessToken string) *se.ServiceError {
-	return cu.userService.DeleteAuth(userId, accessToken)
+func (cu *cachedUserService) DeleteAuth(userId, accessToken string) (err *se.ServiceError) {
+	err = cu.userService.DeleteAuth(userId, accessToken)
+	if err == nil {
+		cu.cache.DeleteByTag(userId)
+	}
+
+	return
 }
 
 // DeleteToken implements UserService
-func (cu *cachedUserService) ClearAuth(userId, accessToken string) *se.ServiceError {
-	cu.cache.DeleteByTag(userId)
-	return cu.userService.ClearAuth(userId, accessToken)
+func (cu *cachedUserService) ClearAuth(userId, accessToken string) (err *se.ServiceError) {
+	err = cu.userService.ClearAuth(userId, accessToken)
+	if err == nil {
+		cu.cache.DeleteByTag(userId)
+	}
+
+	return
 }
 
 // Edit implements UserService
 func (cu *cachedUserService) Edit(userId string, req *forms.EditUser) (*models.User, *se.ServiceError) {
 	user, err := cu.userService.Edit(userId, req)
 	if err == nil {
-		key := fmt.Sprintf("users:%s", userId)
-
-		cu.cache.DeleteByTag("users:all", key)
+		cu.cache.DeleteByTag(utils.UsersTag, fmt.Sprintf("users:%s", userId))
 	}
 
 	return user, err
@@ -52,7 +68,7 @@ func (cu *cachedUserService) Edit(userId string, req *forms.EditUser) (*models.U
 func (cu *cachedUserService) GetAll() ([]*models.User, *se.ServiceError) {
 	var users []*models.User
 
-	err := cu.cache.Get("users:all", &users)
+	err := cu.cache.Get(utils.UsersTag, &users)
 	if err == nil {
 		return users, nil
 	}
@@ -62,7 +78,7 @@ func (cu *cachedUserService) GetAll() ([]*models.User, *se.ServiceError) {
 		return nil, er
 	}
 
-	cu.cache.AddByTag("users:all", users, "users:all")
+	cu.cache.AddByTag(utils.UsersTag, users, utils.UsersTag)
 	return users, nil
 }
 

@@ -246,7 +246,7 @@ func TestEditTable_User(t *testing.T) {
 func TestDeleteTable_Admin(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := createAndAddMenu(nil)
+	table := createAndAddTable(nil)
 	admin := generateAdminForm()
 	form := generateLoginForm(admin)
 	_ = createAndRegisterUser(admin)

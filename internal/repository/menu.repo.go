@@ -7,7 +7,7 @@ import (
 
 type MenuRepo interface {
 	Check(name, category string) (bool, error)
-	CheckMenuExists(menuId string) (bool, error)
+	MenuExists(menuId string) (bool, error)
 
 	Add(menu *models.Menu) (men *models.Menu, err error)
 	Get(menuId string) (men *models.MenuFood, err error)
@@ -20,8 +20,7 @@ type menuRepo struct {
 	conn *sql.DB
 }
 
-// CheckMenu implements MenuRepo
-func (m *menuRepo) CheckMenuExists(menuId string) (bool, error) {
+func (m *menuRepo) MenuExists(menuId string) (bool, error) {
 	var name string
 
 	query := `SELECT name FROM menu WHERE id = $1`
