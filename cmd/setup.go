@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	middleware "restaurant-management/cmd/middleware"
 	routes "restaurant-management/cmd/routes"
@@ -17,8 +18,11 @@ import (
 	service "restaurant-management/internal/service"
 	utils "restaurant-management/utils"
 
+	pgadapter "github.com/casbin/casbin-pg-adapter"
 	"github.com/casbin/casbin/v2"
 	gin "github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
+	"github.com/go-redis/redis/v8"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -26,12 +30,16 @@ import (
 var (
 	addr, mode, dsn, secret                       string
 	cache                                         bool
-	host, username, passwd, dbname                string
+	host, username, passwd, dbname, source        string
 	email, email_passwd, email_host, email_port   string
 	redis_username, redis_password, redis_address string
+	db                                            *database.DB
+	rdb                                           *redis.Client
+	casbinEnforcer                                *casbin.Enforcer
 )
 
-var migrate = flag.String("migrate", "false", "for migrations")
+var migrate = flag.Bool("m", false, "for migrations")
+var casbinLoader = flag.Bool("c", false, "casbin loader")
 
 func Setup() {
 	router := gin.New()
@@ -40,22 +48,8 @@ func Setup() {
 	v1.Use(gin.Recovery())
 	router.Use(middleware.CORS())
 
-	db, err := database.New(dsn)
-	if err != nil {
-		log.Println("Error Connecting to DB: ", err)
-	}
 	defer db.Close()
 	conn := db.GetConn()
-
-	cashbin, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
-	if err != nil {
-		log.Println("Cashbin: ", err)
-	}
-
-	rdb := database.NewRedisDB(redis_username, redis_password, redis_address)
-	if rdb == nil {
-		log.Println("Redis is nil, which should not be so")
-	}
 
 	// Cache Repo
 	cacheRepo := repo.NewRedisCache(rdb)
@@ -106,10 +100,10 @@ func Setup() {
 
 	// Routes
 	routes.HomeRoute(v1, homeSrv)
-	routes.UserRoute(v1, userSrv, authSrv, cashbin)
-	routes.TableRoute(v1, tableSrv, authSrv, cashbin)
-	routes.MenuRoute(v1, menuSrv, authSrv, cashbin)
-	routes.FoodRoutes(v1, foodSrv, authSrv, cashbin)
+	routes.UserRoute(v1, userSrv, authSrv, casbinEnforcer)
+	routes.TableRoute(v1, tableSrv, authSrv, casbinEnforcer)
+	routes.MenuRoute(v1, menuSrv, authSrv, casbinEnforcer)
+	routes.FoodRoutes(v1, foodSrv, authSrv, casbinEnforcer)
 	routes.ErrorRoute(router)
 
 	// Documentation
@@ -117,11 +111,75 @@ func Setup() {
 	router.Run(":" + addr)
 }
 
+// Initialize App Variables
 func init() {
+	var err error
+
+	initEnv()
 	flag.Parse()
 
-	// Initiazlize Configs
-	initValues()
+	db, err = database.New(dsn)
+	if err != nil {
+		log.Println("Error Connecting to DB: ", err)
+	}
+
+	opts, _ := pg.ParseURL(source)
+
+	pgdb := pg.Connect(opts)
+
+	adapter, err := pgadapter.NewAdapterByDB(pgdb, pgadapter.WithTableName(utils.CasbinDB))
+	if err != nil {
+		log.Println("Adapter is empty: ", err)
+	}
+
+	casbinEnforcer, err = casbin.NewEnforcer(utils.CasbinModel, adapter)
+	if err != nil {
+		log.Println("Cashbin: ", err)
+	}
+
+	rdb = database.NewRedisDB(redis_username, redis_password, redis_address)
+	if rdb == nil {
+		log.Println("Redis is nil, which should not be so")
+	}
+
+	switch mode {
+	case "production":
+		loadProd()
+	default:
+		loadDev()
+	}
+
+	if *migrate {
+		if err := utils.Migration(dsn); err != nil {
+			log.Println(err)
+		}
+	}
+
+	if *casbinLoader {
+		if err := initCasbinPolicy(utils.CasbinPolicy, casbinEnforcer); err != nil {
+			panic(err)
+		}
+	}
+}
+
+// Initialize Environment Variables
+func initEnv() {
+	addr = config.Environment.ADDR
+	cache = config.Environment.CACHE
+	secret = config.Environment.SECRET_KEY_TOKEN
+	redis_username = config.Environment.REDIS_USERNAME
+	redis_password = config.Environment.REDIS_PASSWORD
+	redis_address = config.Environment.REDIS_ADDRESS
+	host = config.Environment.POSTGRES_HOST
+	username = config.Environment.POSTGRES_USER
+	passwd = config.Environment.POSTGRES_PASSWORD
+	dbname = config.Environment.POSTGRES_DB
+	email_host = config.Environment.HOST
+	email_port = config.Environment.PORT
+	email_passwd = config.Environment.PASSWD
+	email = config.Environment.EMAIL
+	mode = config.Environment.MODE
+	source = config.Environment.DATABASE_SOURCE_DB
 
 	if addr == "" {
 		addr = "8000"
@@ -144,9 +202,12 @@ func init() {
 	}
 
 	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, passwd, dbname)
-	fmt.Println("DSN: ", dsn)
 	if dsn == "" {
 		log.Println("DSN cannot be empty")
+	}
+
+	if source == "" {
+		log.Println("DATABASE_SOURCE_DB not provided")
 	}
 
 	if email_host == "" {
@@ -164,37 +225,6 @@ func init() {
 	if email == "" {
 		log.Println("Please provide an email address")
 	}
-
-	switch mode {
-	case "production":
-		loadProd()
-	default:
-		loadDev()
-	}
-
-	if *migrate == "true" {
-		if err := utils.Migration(dsn); err != nil {
-			log.Println(err)
-		}
-	}
-}
-
-func initValues() {
-	addr = config.Environment.ADDR
-	cache = config.Environment.CACHE
-	secret = config.Environment.SECRET_KEY_TOKEN
-	redis_username = config.Environment.REDIS_USERNAME
-	redis_password = config.Environment.REDIS_PASSWORD
-	redis_address = config.Environment.REDIS_ADDRESS
-	host = config.Environment.POSTGRES_HOST
-	username = config.Environment.POSTGRES_USER
-	passwd = config.Environment.POSTGRES_PASSWORD
-	dbname = config.Environment.POSTGRES_DB
-	email_host = config.Environment.HOST
-	email_port = config.Environment.PORT
-	email_passwd = config.Environment.PASSWD
-	email = config.Environment.EMAIL
-	mode = config.Environment.MODE
 }
 
 func loadDev() {
@@ -205,4 +235,23 @@ func loadProd() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = io.MultiWriter(os.Stdout, logger.NewLogger())
 	gin.DisableConsoleColor()
+}
+
+func initCasbinPolicy(filename string, enforcer *casbin.Enforcer) error {
+	p, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+
+	validPolicies := [][]string{}
+	policies := strings.Split(string(p), "\n")
+	for _, policy := range policies {
+		if strings.HasPrefix(policy, "p") {
+			policyDetails := strings.Split(policy, ", ")
+			validPolicies = append(validPolicies, policyDetails[1:])
+		}
+	}
+
+	_, err = enforcer.AddPolicies(validPolicies)
+	return err
 }

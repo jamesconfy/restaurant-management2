@@ -20,6 +20,7 @@ type menuRepo struct {
 	conn *sql.DB
 }
 
+// CheckMenu implements MenuRepo
 func (m *menuRepo) MenuExists(menuId string) (bool, error) {
 	var name string
 

@@ -1810,9 +1810,6 @@ const docTemplate = `{
                 "last_name": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
-                },
                 "phone_number": {
                     "type": "string"
                 },
@@ -1887,11 +1884,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:80",
+	Host:             "restaurant-management.fly.dev",
 	BasePath:         "/v1",
 	Schemes:          []string{"http", "https"},
-	Title:            "Project",
-	Description:      "Server for {{your server link}}",
+	Title:            "Restaurant Management",
+	Description:      "An application for management of restaurant incomings and outgoings.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

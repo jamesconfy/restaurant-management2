@@ -12,4 +12,4 @@ RUN go build -o restaurant-management-api
 
 EXPOSE  80
 
-CMD [ "./restaurant-management-api", "--migrate=true" ]
+CMD [ "./restaurant-management-api", "--m=true" ]

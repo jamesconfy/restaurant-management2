@@ -180,3 +180,10 @@ Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
 [GIN] 2023/05/08 - 12:15:56 | 500 |   55.774167ms |             ::1 | POST     "/api/v1/users"
+[GIN] 2023/06/05 - 18:15:07 | 404 |  699.434327ms |             ::1 | POST     "/v1/auth/login"
+[GIN] 2023/06/05 - 18:15:15 | 404 |  233.874141ms |             ::1 | POST     "/v1/auth/login"
+[GIN] 2023/06/05 - 18:15:23 | 200 |  177.718067ms |             ::1 | GET      "/v1/menus"
+[GIN] 2023/06/05 - 18:15:25 | 200 |  187.366217ms |             ::1 | GET      "/v1/menus"
+[GIN] 2023/06/05 - 18:15:26 | 200 |   229.04653ms |             ::1 | GET      "/v1/menus"
+[GIN] 2023/06/05 - 18:15:27 | 200 |  159.136621ms |             ::1 | GET      "/v1/menus"
+[GIN] 2023/06/05 - 18:15:28 | 200 |  200.255071ms |             ::1 | GET      "/v1/menus"

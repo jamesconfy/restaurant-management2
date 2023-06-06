@@ -8,10 +8,16 @@ migrate_force:
 	migrate -path db/migration -database "" force $(version)
 
 run:	
-	go build restaurant-management-api.go && ./restaurant-management-api --migrate=false
+	go build restaurant-management-api.go && ./restaurant-management-api
 
 run_migrate:
-	go build restaurant-management-api.go && ./restaurant-management-api --migrate=true
+	go build restaurant-management-api.go && ./restaurant-management-api -m
+
+run_migrate_casbin:
+	go build restaurant-management-api.go && ./restaurant-management-api -m -c
+
+run_casbin:
+	go build restaurant-management-api.go && ./restaurant-management-api -c
 
 gotidy:
 	go mod tidy

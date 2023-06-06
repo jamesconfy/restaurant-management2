@@ -3,9 +3,9 @@ package main
 import "restaurant-management/cmd"
 
 func main() {
-	// @title           Project
+	// @title           Restaurant Management
 	// @version         1.0
-	// @description     Server for {{your server link}}
+	// @description     An application for management of restaurant incomings and outgoings.
 	// @termsOfService  http://swagger.io/terms/
 
 	// @contact.name   Confidence James
@@ -15,7 +15,7 @@ func main() {
 	// @license.name  Apache 2.0
 	// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-	// @host      localhost:80
+	// @host     restaurant-management.fly.dev
 	// @schemes http https
 	// @BasePath  /v1
 

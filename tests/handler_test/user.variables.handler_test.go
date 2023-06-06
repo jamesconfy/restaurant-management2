@@ -47,11 +47,11 @@ func createAndRegisterUser(user *forms.User) *models.User {
 
 	if resultUser.Role == "USER" {
 		obj := fmt.Sprintf("%s/%v", utils.UserPath, resultUser.Id)
-		cashbin.AddPolicy(resultUser.Id, obj, utils.PolicyMethodGet, utils.PolicyEffectAllow)
+		cashbinEnforcer.AddPolicy(resultUser.Id, obj, utils.PolicyMethodGet, utils.PolicyEffectAllow)
 	}
 
-	cashbin.AddGroupingPolicy(resultUser.Id, fmt.Sprintf("role::%v", strings.ToLower(resultUser.Role)))
-	cashbin.SavePolicy()
+	cashbinEnforcer.AddGroupingPolicy(resultUser.Id, fmt.Sprintf("role::%v", strings.ToLower(resultUser.Role)))
+	cashbinEnforcer.SavePolicy()
 
 	return resultUser
 }
