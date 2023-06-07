@@ -25,6 +25,7 @@ var (
 	ta repo.TableRepo
 	f  repo.FoodRepo
 	m  repo.MenuRepo
+	o  repo.OrderRepo
 )
 
 func init() {
@@ -78,6 +79,7 @@ func init() {
 	ta = repo.NewTableRepo(db)
 	f = repo.NewFoodRepo(db)
 	m = repo.NewMenuRepo(db)
+	o = repo.NewOrderRepo(db)
 }
 
 func initDBSchema(db *sql.DB) error {
