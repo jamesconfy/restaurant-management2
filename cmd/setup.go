@@ -243,8 +243,17 @@ func initCasbinPolicy(filename string, enforcer *casbin.Enforcer) error {
 		return err
 	}
 
-	validPolicies := [][]string{}
 	policies := strings.Split(string(p), "\n")
+
+	go addPolicy(enforcer, policies)
+	go addGroupingPolicy(enforcer, policies)
+
+	return nil
+}
+
+func addPolicy(enforcer *casbin.Enforcer, policies []string) error {
+	validPolicies := [][]string{}
+
 	for _, policy := range policies {
 		if strings.HasPrefix(policy, "p") {
 			policyDetails := strings.Split(policy, ", ")
@@ -252,6 +261,31 @@ func initCasbinPolicy(filename string, enforcer *casbin.Enforcer) error {
 		}
 	}
 
-	_, err = enforcer.AddPolicies(validPolicies)
-	return err
+	if len(validPolicies) > 0 {
+		_, err := enforcer.AddPolicies(validPolicies)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func addGroupingPolicy(enforcer *casbin.Enforcer, policies []string) error {
+	validGrouping := [][]string{}
+	for _, policy := range policies {
+		if strings.HasPrefix(policy, "g") {
+			policyDetails := strings.Split(policy, ", ")
+			validGrouping = append(validGrouping, policyDetails[1:])
+		}
+	}
+
+	if len(validGrouping) > 0 {
+		_, err := enforcer.AddGroupingPolicies(validGrouping)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
