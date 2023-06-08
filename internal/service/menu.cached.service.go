@@ -38,7 +38,7 @@ func (cm *cachedMenuService) Delete(menuId string) (err *se.ServiceError) {
 func (cm *cachedMenuService) Edit(menuId string, req *forms.EditMenu) (menu *models.Menu, err *se.ServiceError) {
 	menu, err = cm.menuSrv.Edit(menuId, req)
 	if err == nil {
-		cm.cache.DeleteByTag(menuId)
+		cm.cache.DeleteByTag(utils.MenuPath, menuId)
 	}
 
 	return

@@ -21,7 +21,7 @@ func createAndAddUser(user *models.User) *models.User {
 		user = generateUser()
 	}
 
-	user, err := u.Add(user)
+	user, err := userRepo.Add(user)
 	if err != nil {
 		panic(err)
 	}

@@ -1,6 +1,9 @@
 package repo_test
 
-import "restaurant-management/internal/models"
+import (
+	"math/rand"
+	"restaurant-management/internal/models"
+)
 
 func generateOrder(table *models.Table) *models.Order {
 	if table == nil {
@@ -8,7 +11,9 @@ func generateOrder(table *models.Table) *models.Order {
 	}
 
 	return &models.Order{
-		TableId: table.Id,
+		TableId:    table.Id,
+		DeliveryId: rand.Intn(3) + 1,
+		PaymentId:  rand.Intn(2) + 1,
 	}
 }
 
@@ -17,7 +22,7 @@ func createAndAddOrder(table *models.Table, order *models.Order) *models.Order {
 		order = generateOrder(table)
 	}
 
-	order, err := o.Add(order)
+	order, err := orderRepo.Add(order)
 	if err != nil {
 		panic(err)
 	}

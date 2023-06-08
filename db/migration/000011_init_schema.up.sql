@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS orders (
     PRIMARY KEY(id),
     FOREIGN KEY(delivery_id) REFERENCES delivery(id) ON DELETE CASCADE,
     FOREIGN KEY(table_id) REFERENCES tables(id) ON DELETE CASCADE,
-    FOREIGN KEY(payment_id) REFERENCES payments(id) ON DELETE CASCADE
+    FOREIGN KEY(payment_id) REFERENCES payment_method(id) ON DELETE CASCADE
 );

@@ -1,8 +1,8 @@
-CREATE TYPE payment_status AS ENUM ('PAID', 'NOT_PAID');
+CREATE TYPE payment_type AS ENUM ('CASH', 'CARD');
 
-CREATE TABLE IF NOT EXISTS payments (
+CREATE TABLE IF NOT EXISTS payment_method (
     id SERIAL,
-    status payment_status DEFAULT 'NOT_PAID',
+    payment_type payment_type DEFAULT 'CASH',
     date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

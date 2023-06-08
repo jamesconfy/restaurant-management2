@@ -18,7 +18,7 @@ func createAndAddMenu(menu *models.Menu) *models.Menu {
 		menu = generateMenu()
 	}
 
-	men, err := m.Add(menu)
+	men, err := menuRepo.Add(menu)
 	if err != nil {
 		panic(err)
 	}

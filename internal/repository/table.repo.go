@@ -27,14 +27,14 @@ func (t *tableSql) TableExists(tableId string) (bool, error) {
 	err := t.conn.QueryRow(query, tableId).Scan(&seats)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// Name and Category does not exist
+			// Table does not exist
 			return false, nil
 		}
 		// An error occurred while executing the query
 		return true, err
 	}
 
-	// Name and Category already exists
+	// Table already exists
 	return true, nil
 }
 

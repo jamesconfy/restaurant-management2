@@ -20,7 +20,7 @@ func TestNameAndCategory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ok, err := m.Check(tt.menuName, tt.menuCategory)
+			ok, err := menuRepo.Check(tt.menuName, tt.menuCategory)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.Check() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -46,7 +46,7 @@ func TestMenuExists(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ok, err := m.MenuExists(tt.id)
+			ok, err := menuRepo.MenuExists(tt.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.CheckMenuExists() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -71,7 +71,7 @@ func TestAddMenu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := m.Add(tt.menu)
+			_, err := menuRepo.Add(tt.menu)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.Add() error = %v, wantErr %v", err, tt.wantErr)
@@ -93,7 +93,7 @@ func TestGetMenu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := m.Get(tt.id)
+			_, err := menuRepo.Get(tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -117,7 +117,7 @@ func TestEditMenu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := m.Edit(tt.id, tt.menu)
+			_, err := menuRepo.Edit(tt.id, tt.menu)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
@@ -139,7 +139,7 @@ func TestDeleteMenu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := m.Delete(tt.id)
+			err := menuRepo.Delete(tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -162,7 +162,7 @@ func TestGetAllMenu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := m.GetAll()
+			_, err := menuRepo.GetAll()
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("menuSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)

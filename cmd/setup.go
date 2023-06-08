@@ -69,6 +69,9 @@ func Setup() {
 	// Food Repository
 	foodRepo := repo.NewFoodRepo(conn)
 
+	// Order Repository
+	orderRepo := repo.NewOrderRepo(conn)
+
 	// Email Service
 	emailSrv := service.NewEmailService(email, email_passwd, email_host, email_port)
 
@@ -90,12 +93,16 @@ func Setup() {
 	// Food Service
 	foodSrv := service.NewFoodService(foodRepo, menuRepo)
 
+	// Order Service
+	orderSrv := service.NewOrderService(orderRepo, tableRepo)
+
 	if cache && rdb != nil {
 		userSrv = service.NewCachedUserService(userSrv, cacheRepo)
 		authSrv = service.NewCachedAuthService(authSrv, cacheRepo)
 		menuSrv = service.NewCachedMenuService(menuSrv, cacheRepo)
 		tableSrv = service.NewCachedTableService(tableSrv, cacheRepo)
 		foodSrv = service.NewCachedFoodService(foodSrv, cacheRepo)
+		orderSrv = service.NewCachedOrderService(orderSrv, cacheRepo)
 	}
 
 	// Routes
@@ -104,6 +111,7 @@ func Setup() {
 	routes.TableRoute(v1, tableSrv, authSrv, casbinEnforcer)
 	routes.MenuRoute(v1, menuSrv, authSrv, casbinEnforcer)
 	routes.FoodRoutes(v1, foodSrv, authSrv, casbinEnforcer)
+	routes.OrderRoutes(v1, orderSrv, authSrv, casbinEnforcer)
 	routes.ErrorRoute(router)
 
 	// Documentation

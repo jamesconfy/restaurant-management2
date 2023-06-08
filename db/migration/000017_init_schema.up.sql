@@ -1,1 +1,0 @@
-ALTER TABLE payments RENAME TO payment_method;

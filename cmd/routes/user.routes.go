@@ -26,12 +26,12 @@ func UserRoute(router *gin.RouterGroup, userSrv service.UserService, authSrv ser
 	auth := router.Group("/auth")
 	{
 		auth.POST("/register", handler.Add)
+		auth.POST("/register/admin", handler.Add)
 		auth.POST("/login", handler.Login)
 	}
 
 	auth.Use(jwt.CheckJWT())
 	{
-		auth.POST("/register/admin", handler.Add)
 		auth.POST("/logout", handler.Logout)
 		auth.DELETE("/clear", handler.ClearAuth)
 	}

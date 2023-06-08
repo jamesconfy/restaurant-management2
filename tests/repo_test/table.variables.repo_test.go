@@ -17,7 +17,7 @@ func createAndAddTable(table *models.Table) *models.Table {
 		table = generateTable()
 	}
 
-	table, err := ta.Add(table)
+	table, err := tableRepo.Add(table)
 	if err != nil {
 		panic(err)
 	}

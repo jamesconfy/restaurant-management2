@@ -5,4 +5,5 @@ const (
 	MenusTag  = "menus:all"
 	FoodsTag  = "foods:all"
 	TablesTag = "tables:all"
+	OrdersTag = "orders:all"
 )

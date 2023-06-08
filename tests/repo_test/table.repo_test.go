@@ -19,7 +19,7 @@ func TestAddTable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ta.Add(tt.table)
+			_, err := tableRepo.Add(tt.table)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.Add() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -40,7 +40,7 @@ func TestGetTable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			table, err := ta.Get(tt.id)
+			table, err := tableRepo.Get(tt.id)
 			fmt.Println("Table: ", table)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -63,7 +63,7 @@ func TestGetAllTable_Admin(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ta.GetAll("ADMIN")
+			_, err := tableRepo.GetAll("ADMIN")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -85,7 +85,7 @@ func TestGetAllTable_User(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ta.GetAll("USER")
+			_, err := tableRepo.GetAll("USER")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -110,7 +110,7 @@ func TestEditTable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ta.Edit(tt.id, tt.table)
+			_, err := tableRepo.Edit(tt.id, tt.table)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
@@ -132,7 +132,7 @@ func TestDeleteTable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ta.Delete(tt.id)
+			err := tableRepo.Delete(tt.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("tableSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)
 			}

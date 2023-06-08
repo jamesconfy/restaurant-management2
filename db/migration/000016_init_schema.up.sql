@@ -1,2 +1,1 @@
-INSERT INTO payments (status) VALUES ('NOT_PAID');
-INSERT INTO payments (status) VALUES ('PAID');
+INSERT INTO payment_method (payment_type) VALUES ('CASH'), ('CARD');

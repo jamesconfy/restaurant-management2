@@ -29,7 +29,7 @@ func createAndAddFood(menu *models.Menu, food *models.Food) *models.Food {
 		food = generateFood(menu)
 	}
 
-	food, err := f.Add(food)
+	food, err := foodRepo.Add(food)
 	if err != nil {
 		panic(err)
 	}

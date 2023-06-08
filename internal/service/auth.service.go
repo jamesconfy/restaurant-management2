@@ -95,7 +95,6 @@ func (t *authSrv) Validate(url string) (*Token, error) {
 		return nil, err
 	}
 
-	
 	if row.ExpiresAt.Before(time.Now().Local()) {
 		return nil, fmt.Errorf("token is expired")
 	}

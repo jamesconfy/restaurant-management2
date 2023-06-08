@@ -24,7 +24,7 @@ func createAndAddAuth(auth *models.Auth, user *models.User) *models.Auth {
 		auth = generateAuth(user)
 	}
 
-	auth, err := a.Add(auth)
+	auth, err := authRepo.Add(auth)
 	if err != nil {
 		panic(err)
 	}

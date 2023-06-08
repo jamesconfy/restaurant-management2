@@ -20,7 +20,7 @@ func TestAddFood(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := f.Add(tt.food)
+			_, err := foodRepo.Add(tt.food)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("foodSql.Add() error = %v, wantErr %v", err, tt.wantErr)
@@ -45,7 +45,7 @@ func TestGetFood(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := f.Get(tt.id)
+			_, err := foodRepo.Get(tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("foodSql.Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -70,7 +70,7 @@ func TestGetAllFood(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := f.GetAll()
+			_, err := foodRepo.GetAll()
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("foodSql.GetAll() error = %v, wantErr %v", err, tt.wantErr)
@@ -96,7 +96,7 @@ func TestEditFood(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := f.Edit(tt.id, tt.food)
+			_, err := foodRepo.Edit(tt.id, tt.food)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("foodSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
@@ -119,7 +119,7 @@ func TestDeleteFood(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := f.Delete(tt.id)
+			err := foodRepo.Delete(tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("foodSql.Delete() error = %v, wantErr %v", err, tt.wantErr)

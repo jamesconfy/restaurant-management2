@@ -80,11 +80,12 @@ func TestGetAllMenu(t *testing.T) {
 func TestEditMenu(t *testing.T) {
 	// Create a new user object
 	menu := createAndAddMenu(nil)
+	req := generateEditMenuForm()
+
 	for i := 0; i < 5; i++ {
 		_ = createAndAddFood(menu, nil)
 
 	}
-	req := generateEditMenuForm()
 
 	tests := []struct {
 		name    string
