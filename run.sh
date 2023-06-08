@@ -20,8 +20,13 @@ case $1 in
 dev)
     eval $(awk '!/^#/ && NF > 0 {print "export "  $1}' .env.dev)
     m=$(getFlag "m" $@)
+    c=$(getFlag "c" $@)
 
-    if [[ $m == "true" ]]; then
+    if [ $m == "true" ] && [ $c == "true" ]; then
+        make run_migrate_casbin
+    elif [ $m == "false" ] && [ $c == "true" ]; then
+        make run_casbin
+    elif [ $m == "true" ] && [ $c == "false" ]; then
         make run_migrate
     else
         make run

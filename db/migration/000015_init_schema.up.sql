@@ -1,0 +1,1 @@
+INSERT INTO delivery (status) VALUES ('ONGOING'), ('DELIVERED'), ('NOT_DELIVERED');

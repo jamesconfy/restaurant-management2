@@ -10,6 +10,6 @@ LABEL Name=restaurant-management Version=0.0.1
 
 RUN go build -o restaurant-management-api
 
-EXPOSE  8080
+EXPOSE  80
 
-CMD [ "./restaurant-management-api", "--migrate=true" ]
+CMD [ "./restaurant-management-api", "--m=true", "--c=true" ]

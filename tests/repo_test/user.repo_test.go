@@ -21,7 +21,7 @@ func TestAddUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := u.Add(tt.user)
+			_, err := userRepo.Add(tt.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("userSql.Add() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -42,7 +42,7 @@ func TestEmailExists(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := u.EmailExists(tt.email)
+			got, _ := userRepo.EmailExists(tt.email)
 			if got != tt.want {
 				t.Errorf("userSql.EmailExists() got = %v, wantErr %v", got, tt.want)
 			}
@@ -64,7 +64,7 @@ func TestPhoneExists(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := u.PhoneExists(tt.phone)
+			got, _ := userRepo.PhoneExists(tt.phone)
 			if got != tt.want {
 				t.Errorf("userSql.PhoneExists() got = %v, wantErr %v", got, tt.want)
 			}
@@ -85,7 +85,7 @@ func TestGetByEmail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := u.GetByEmail(tt.email)
+			_, err := userRepo.GetByEmail(tt.email)
 			if (err != nil) != tt.want {
 				t.Errorf("userSql.GetByEmail() error = %v, wantErr %v", err, tt.want)
 			}
@@ -106,7 +106,7 @@ func TestGetById(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := u.GetById(tt.id)
+			_, err := userRepo.GetById(tt.id)
 			if (err != nil) != tt.want {
 				t.Errorf("userSql.GetById() error = %v, wantErr %v", err, tt.want)
 			}
@@ -128,7 +128,7 @@ func TestGetAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := u.GetAll()
+			_, err := userRepo.GetAll()
 			if (err != nil) != tt.want {
 				t.Errorf("userSql.GetAll() error = %v, wantErr %v", err, tt.want)
 			}
@@ -152,7 +152,7 @@ func TestEditUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := u.Edit(tt.id, tt.user)
+			_, err := userRepo.Edit(tt.id, tt.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("userSql.Edit() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -173,7 +173,7 @@ func TestDeleteUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := u.Delete(tt.id)
+			err := userRepo.Delete(tt.id)
 			if (err != nil) != tt.want {
 				t.Errorf("userSql.Delete() error = %v, wantErr %v", err, tt.want)
 			}

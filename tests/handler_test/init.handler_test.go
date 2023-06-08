@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	routes "restaurant-management/cmd/routes"
@@ -12,8 +14,10 @@ import (
 	"restaurant-management/internal/service"
 	"restaurant-management/utils"
 
+	pgadapter "github.com/casbin/casbin-pg-adapter"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 
 	"github.com/golang-migrate/migrate/v4"
 	postgres "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -36,7 +40,7 @@ var (
 	router *gin.Engine
 
 	// Cashbin
-	cashbin *casbin.Enforcer
+	cashbinEnforcer *casbin.Enforcer
 
 	// Service
 	homeSrv  service.HomeService
@@ -82,7 +86,12 @@ func init() {
 		panic(err)
 	}
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable", host, req.Env["POSTGRES_USER"], req.Env["POSTGRES_PASSWORD"], sqlPort["5432/tcp"][0].HostPort, req.Env["POSTGRES_DB"])
+	username := req.Env["POSTGRES_USER"]
+	password := req.Env["POSTGRES_PASSWORD"]
+	dbname := req.Env["POSTGRES_DB"]
+	port := sqlPort["5432/tcp"][0].HostPort
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable", host, username, password, port, dbname)
 
 	db, err = sql.Open("postgres", dsn)
 	if err != nil {
@@ -94,9 +103,24 @@ func init() {
 		panic(err)
 	}
 
-	cashbin, err = casbin.NewEnforcer("../../model_test.conf", "../../policy_test.csv")
+	source := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, dbname)
+	opts, _ := pg.ParseURL(source)
+
+	pgdb := pg.Connect(opts)
+
+	adapter, err := pgadapter.NewAdapterByDB(pgdb, pgadapter.WithTableName(utils.CasbinDB))
+	if err != nil {
+		log.Println("Adapter is empty: ", err)
+	}
+
+	cashbinEnforcer, err = casbin.NewEnforcer(utils.CasbinTestModel, adapter)
 	if err != nil {
 		log.Println("Cashbin: ", err)
+	}
+
+	err = initCasbinPolicy(utils.CasbinTestPolicy, cashbinEnforcer)
+	if err != nil {
+		panic(err)
 	}
 
 	// Initialize Repository
@@ -143,15 +167,34 @@ func initDBSchema(db *sql.DB) error {
 	return nil
 }
 
+func initCasbinPolicy(filename string, enforcer *casbin.Enforcer) error {
+	p, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+
+	validPolicies := [][]string{}
+	policies := strings.Split(string(p), "\n")
+	for _, policy := range policies {
+		if strings.HasPrefix(policy, "p") {
+			policyDetails := strings.Split(policy, ", ")
+			validPolicies = append(validPolicies, policyDetails[1:])
+		}
+	}
+
+	_, err = enforcer.AddPolicies(validPolicies)
+	return err
+}
+
 func setupApp() *gin.Engine {
 	router := gin.New()
 	gin.SetMode(gin.ReleaseMode)
 	v1 := router.Group(utils.BasePath)
 
-	routes.UserRoute(v1, userSrv, authSrv, cashbin)
-	routes.MenuRoute(v1, menuSrv, authSrv, cashbin)
-	routes.FoodRoutes(v1, foodSrv, authSrv, cashbin)
-	routes.TableRoute(v1, tableSrv, authSrv, cashbin)
+	routes.UserRoute(v1, userSrv, authSrv, cashbinEnforcer)
+	routes.MenuRoute(v1, menuSrv, authSrv, cashbinEnforcer)
+	routes.FoodRoutes(v1, foodSrv, authSrv, cashbinEnforcer)
+	routes.TableRoute(v1, tableSrv, authSrv, cashbinEnforcer)
 	routes.HomeRoute(v1, homeSrv)
 	routes.ErrorRoute(router)
 

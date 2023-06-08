@@ -25,6 +25,7 @@ var (
 	authRepo  repo.AuthRepo
 	menuRepo  repo.MenuRepo
 	foodRepo  repo.FoodRepo
+	orderRepo repo.OrderRepo
 
 	// Service
 	emailSrv service.EmailService
@@ -33,6 +34,7 @@ var (
 	tableSrv service.TableService
 	menuSrv  service.MenuService
 	foodSrv  service.FoodService
+	orderSrv service.OrderService
 )
 
 func init() {
@@ -86,6 +88,7 @@ func init() {
 	tableRepo = repo.NewTableRepo(db)
 	menuRepo = repo.NewMenuRepo(db)
 	foodRepo = repo.NewFoodRepo(db)
+	orderRepo = repo.NewOrderRepo(db)
 
 	emailSrv = service.NewEmailService("fromEmail string", "password string", "host string", "port string")
 	authSrv = service.NewAuthService(authRepo, "really_random_string")
@@ -94,6 +97,7 @@ func init() {
 	tableSrv = service.NewTableService(tableRepo)
 	menuSrv = service.NewMenuService(menuRepo)
 	foodSrv = service.NewFoodService(foodRepo, menuRepo)
+	orderSrv = service.NewOrderService(orderRepo, tableRepo)
 }
 
 func initDBSchema(db *sql.DB) error {

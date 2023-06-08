@@ -93,7 +93,12 @@ func (m *menuSrv) Delete(menuId string) *se.ServiceError {
 		return se.Internal(err, "invalid menu id")
 	}
 
-	err := m.repo.Delete(menuId)
+	ok, err := m.repo.MenuExists(menuId)
+	if err != nil || !ok {
+		return se.NotFoundOrInternal(err, "menu not found")
+	}
+
+	err = m.repo.Delete(menuId)
 	if err != nil {
 		return se.NotFoundOrInternal(err, "menu not found")
 	}

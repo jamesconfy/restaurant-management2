@@ -6,6 +6,8 @@ import (
 )
 
 type TableRepo interface {
+	TableExists(tableId string) (bool, error)
+
 	Add(table *models.Table) (*models.Table, error)
 	Get(id string) (tabl *models.Table, err error)
 	GetAll(role string) (tables []*models.Table, err error)
@@ -15,6 +17,25 @@ type TableRepo interface {
 
 type tableSql struct {
 	conn *sql.DB
+}
+
+func (t *tableSql) TableExists(tableId string) (bool, error) {
+	var seats string
+
+	query := `SELECT seats FROM tables WHERE id = $1`
+
+	err := t.conn.QueryRow(query, tableId).Scan(&seats)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Table does not exist
+			return false, nil
+		}
+		// An error occurred while executing the query
+		return true, err
+	}
+
+	// Table already exists
+	return true, nil
 }
 
 func (t *tableSql) Add(table *models.Table) (tabl *models.Table, err error) {

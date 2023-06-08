@@ -19,7 +19,7 @@ func TestCreateAuth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := a.Add(tt.auth)
+			_, err := authRepo.Add(tt.auth)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("auth.CreateAuth() error = %v, wantErr %v", err, tt.wantErr)
@@ -42,7 +42,7 @@ func TestGetAuth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := a.Get(auth.UserId, auth.AccessToken)
+			_, err := authRepo.Get(auth.UserId, auth.AccessToken)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("auth.GetAuth() error = %v, wantErr %v", err, tt.wantErr)
@@ -66,7 +66,7 @@ func TestDeleteAuth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := a.Delete(tt.id, tt.accessToken)
+			err := authRepo.Delete(tt.id, tt.accessToken)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("auth.DeleteAuth() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -89,7 +89,7 @@ func TestClearAuth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := a.Clear(tt.id, tt.accessToken)
+			err := authRepo.Clear(tt.id, tt.accessToken)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("auth.ClearAuth() error = %v, wantErr %v", err, tt.wantErr)
 			}

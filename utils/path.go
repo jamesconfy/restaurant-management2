@@ -7,6 +7,7 @@ const (
 	TablePath = "/v1/tables"
 	MenuPath  = "/v1/menus"
 	FoodPath  = "/v1/foods"
+	OrderPath = "/v1/orders"
 
 	PolicyMethodGet    = "GET"
 	PolicyMethodPost   = "POST"

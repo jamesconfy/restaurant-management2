@@ -1,0 +1,1 @@
+INSERT INTO payment_method (payment_type) VALUES ('CASH'), ('CARD');

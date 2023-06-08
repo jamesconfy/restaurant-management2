@@ -6,26 +6,26 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type db struct {
+type DB struct {
 	conn *sql.DB
 }
 
-func (m *db) Ping() error {
+func (m *DB) Ping() error {
 	return m.conn.Ping()
 }
 
-func (m *db) Close() error {
+func (m *DB) Close() error {
 	return m.conn.Close()
 }
 
-func (m *db) GetConn() *sql.DB {
+func (m *DB) GetConn() *sql.DB {
 	return m.conn
 }
 
-func New(connStr string) (*db, error) {
+func New(connStr string) (*DB, error) {
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
 	}
-	return &db{conn: conn}, nil
+	return &DB{conn: conn}, nil
 }

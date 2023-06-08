@@ -1,3 +1,3 @@
-DELETE FROM pg_type WHERE typname = 'payment_status';
+DELETE FROM pg_type WHERE typname = 'payment_type';
 
-DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS payment_method;

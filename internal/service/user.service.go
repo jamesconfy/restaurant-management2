@@ -10,7 +10,7 @@ import (
 )
 
 type UserService interface {
-	Create(req *forms.User) (*models.User, *se.ServiceError)
+	Add(req *forms.User) (*models.User, *se.ServiceError)
 	Login(req *forms.Login) (*models.Auth, *se.ServiceError)
 	Get(userId string) (*models.User, *se.ServiceError)
 	GetAll() ([]*models.User, *se.ServiceError)
@@ -27,7 +27,7 @@ type userSrv struct {
 	emailSrv EmailService
 }
 
-func (u *userSrv) Create(req *forms.User) (*models.User, *se.ServiceError) {
+func (u *userSrv) Add(req *forms.User) (*models.User, *se.ServiceError) {
 	err := Validator.validate(req)
 	if err != nil {
 		return nil, se.Validating(err)

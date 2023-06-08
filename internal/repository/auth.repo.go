@@ -2,7 +2,6 @@ package repo
 
 import (
 	"database/sql"
-	"strconv"
 	"time"
 
 	"restaurant-management/config"
@@ -24,7 +23,7 @@ func (a *authSql) Add(auth *models.Auth) (auh *models.Auth, err error) {
 	auh = new(models.Auth)
 
 	expires_at := config.Environment.EXPIRES_AT
-	if expires_at != "" {
+	if expires_at != 0 {
 		query := `INSERT INTO auth(user_id, access_token, refresh_token, expires_at) VALUES ($1, $2, $3, $4) RETURNING id, user_id, access_token, refresh_token, expires_at, date_created, date_updated`
 
 		err = a.conn.QueryRow(query, auth.UserId, auth.AccessToken, auth.RefreshToken, a.getExpiry(expires_at)).Scan(&auh.Id, &auh.UserId, &auh.AccessToken, &auh.RefreshToken, &auh.ExpiresAt, &auh.DateCreated, &auh.DateUpdated)
@@ -83,7 +82,6 @@ func NewAuthRepo(conn *sql.DB) AuthRepo {
 	return &authSql{conn: conn}
 }
 
-func (a *authSql) getExpiry(expires_at string) time.Time {
-	expiryInt, _ := strconv.Atoi(expires_at)
-	return time.Now().Add(time.Hour * time.Duration(expiryInt))
+func (a *authSql) getExpiry(expires_at int64) time.Time {
+	return time.Now().Add(time.Hour * time.Duration(expires_at))
 }

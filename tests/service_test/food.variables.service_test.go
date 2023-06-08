@@ -9,6 +9,10 @@ import (
 )
 
 func generateFoodForm(menu *models.Menu) *forms.Food {
+	if menu == nil {
+		menu = createAndAddMenu(nil)
+	}
+
 	return &forms.Food{
 		Name:   faker.Name(),
 		Price:  rand.Float64() * 100,
@@ -31,10 +35,6 @@ func generateEditFoodForm(menu *models.Menu) *forms.EditFood {
 }
 
 func createAndAddFood(menu *models.Menu, food *forms.Food) *models.Food {
-	if menu == nil {
-		menu = createAndAddMenu(nil)
-	}
-
 	if food == nil {
 		food = generateFoodForm(menu)
 	}

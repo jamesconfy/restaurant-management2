@@ -31,13 +31,13 @@ type ErrorMessage struct {
 	Error        any    `json:"error,omitempty"`
 }
 
-func NewDecodingError(err error) *Message {
-	return &Message{
-		ResponseCode: 400,
-		Message:      "Bad request",
-		Error:        err,
-	}
-}
+// func NewDecodingError(err error) *Message {
+// 	return &Message{
+// 		ResponseCode: 400,
+// 		Message:      "Bad request",
+// 		Error:        err,
+// 	}
+// }
 
 func Success(c *gin.Context, message string, data any, count ...int) {
 	var msg Message
@@ -111,6 +111,8 @@ func Error(c *gin.Context, sErr se.ServiceError) {
 
 func getStatusCodeFromSE(errorType se.Type) int {
 	switch errorType {
+	case se.ErrUnauthorized:
+		return http.StatusUnauthorized
 	case se.ErrBadRequest:
 		return http.StatusBadRequest
 	case se.ErrConflict:

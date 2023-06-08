@@ -90,9 +90,14 @@ func (ta *tableSrv) Delete(tableId string) *se.ServiceError {
 		return se.Internal(err, "invalid table id")
 	}
 
-	err := ta.repo.Delete(tableId)
-	if err != nil {
+	ok, err := ta.repo.TableExists(tableId)
+	if err != nil || !ok {
 		return se.NotFoundOrInternal(err, "table not found")
+	}
+
+	err = ta.repo.Delete(tableId)
+	if err != nil {
+		return se.Internal(err)
 	}
 
 	return nil

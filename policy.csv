@@ -1,0 +1,8 @@
+p, role::admin, /v1*, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, role::user, /v1, (GET), allow
+p, role::user, /v1/auth/logout, POST, allow
+p, role::user, /v1/auth/clear, POST, allow
+p, role::user, /v1/users, (GET)|(POST)|(PATCH)|(DELETE), deny
+p, role::user, /v1/users/profile, (GET)|(POST)|(PATCH)|(DELETE), allow
+p, role::user, /v1/tables*, GET, allow
+p, role::user, /v1/menus*, GET, allow

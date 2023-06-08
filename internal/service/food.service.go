@@ -32,7 +32,7 @@ func (f *foodSrv) Add(req *forms.Food) (*models.Food, *se.ServiceError) {
 		return nil, se.Validating(err)
 	}
 
-	ok, err := f.menuRepo.CheckMenuExists(req.MenuId)
+	ok, err := f.menuRepo.MenuExists(req.MenuId)
 	if err != nil || !ok {
 		return nil, se.NotFoundOrInternal(err, "menu not found")
 	}
@@ -110,7 +110,12 @@ func (f *foodSrv) Delete(foodId string) *se.ServiceError {
 		return se.Validating(err)
 	}
 
-	err := f.repo.Delete(foodId)
+	ok, err := f.repo.FoodExists(foodId)
+	if err != nil || !ok {
+		return se.NotFoundOrInternal(err, "food not found")
+	}
+
+	err = f.repo.Delete(foodId)
 	if err != nil {
 		return se.Internal(err)
 	}
@@ -141,7 +146,7 @@ func (f *foodSrv) getEdit(req *forms.EditFood, food *models.Food) (*models.Food,
 			return nil, se.Validating(err)
 		}
 
-		if ok, err := f.menuRepo.CheckMenuExists(req.MenuId); err != nil || !ok {
+		if ok, err := f.menuRepo.MenuExists(req.MenuId); err != nil || !ok {
 			return nil, se.NotFoundOrInternal(err, "menu not found")
 		}
 

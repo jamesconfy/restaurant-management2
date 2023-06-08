@@ -15,7 +15,7 @@ import (
 )
 
 type UserHandler interface {
-	Create(c *gin.Context)
+	Add(c *gin.Context)
 	Login(c *gin.Context)
 	Get(c *gin.Context)
 	GetProfile(c *gin.Context)
@@ -47,7 +47,7 @@ var defaultCookieName = "Authorization"
 // @Failure	404  {object}  se.ServiceError
 // @Failure	500  {object}  se.ServiceError
 // @Router	/auth/register [post]
-func (u *userHandler) Create(c *gin.Context) {
+func (u *userHandler) Add(c *gin.Context) {
 	var req forms.User
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -61,7 +61,7 @@ func (u *userHandler) Create(c *gin.Context) {
 		req.Role = "ADMIN"
 	}
 
-	user, err := u.userSrv.Create(&req)
+	user, err := u.userSrv.Add(&req)
 	if err != nil {
 		response.Error(c, *err)
 		return

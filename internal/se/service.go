@@ -15,6 +15,7 @@ const (
 	ErrServer
 	ErrBadRequest
 	ErrForbidden
+	ErrUnauthorized
 )
 
 func (t Type) String() string {
@@ -29,6 +30,8 @@ func (t Type) String() string {
 		return "BadRequest"
 	case ErrForbidden:
 		return "Forbidden"
+	case ErrUnauthorized:
+		return "Unauthorized"
 	default:
 		return "Unknown"
 
@@ -38,7 +41,7 @@ func (t Type) String() string {
 type ServiceError struct {
 	Time        string `json:"time"`
 	Description string `json:"description"`
-	Error       any    `json:"error" swaggertype:"string"`
+	Error       any    `json:"error,omitempty" swaggertype:"string"`
 	ErrorType   Type   `json:"type" swaggertype:"integer"`
 }
 
@@ -47,6 +50,10 @@ func (se *ServiceError) Type() Type {
 }
 
 func New(description string, err error, errType Type) *ServiceError {
+	if err == nil {
+		return &ServiceError{Time: time.Now().Local().Format(time.RFC3339), Description: description, ErrorType: errType}
+	}
+
 	return &ServiceError{Time: time.Now().Local().Format(time.RFC3339), Description: description, Error: err.Error(), ErrorType: errType}
 }
 
@@ -65,6 +72,15 @@ func Validating(err error) *ServiceError {
 
 func Forbidden(description string) *ServiceError {
 	return New(description, errors.New("forbidden"), ErrForbidden)
+}
+
+func Unauthorized(err error, descriptions ...string) *ServiceError {
+	description := "unauthorized"
+	if len(descriptions) > 0 {
+		description = descriptions[0]
+	}
+
+	return New(description, err, ErrUnauthorized)
 }
 
 func Conflict(description string) *ServiceError {
