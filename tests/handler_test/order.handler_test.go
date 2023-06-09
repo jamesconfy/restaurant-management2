@@ -13,22 +13,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddTable_Admin(t *testing.T) {
+func TestAddOrder_Admin(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := generateTableForm()
+	order := generateOrderForm(nil)
 	admin := generateAdminForm()
 	form := generateLoginForm(admin)
 	_ = createAndRegisterUser(admin)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	obj, err := json.Marshal(table)
+	obj, err := json.Marshal(order)
 	if err != nil {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", utils.TablePath, bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", utils.OrderPath, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -42,22 +42,22 @@ func TestAddTable_Admin(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
 
-func TestAddTable_User(t *testing.T) {
+func TestAddOrder_User(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := generateTableForm()
+	order := generateOrderForm(nil)
 	user := generateUserForm()
 	form := generateLoginForm(user)
 	_ = createAndRegisterUser(user)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	obj, err := json.Marshal(table)
+	obj, err := json.Marshal(order)
 	if err != nil {
 		panic(err)
 	}
 
-	req, _ := http.NewRequest("POST", utils.TablePath, bytes.NewReader(obj))
+	req, _ := http.NewRequest("POST", utils.OrderPath, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -71,17 +71,17 @@ func TestAddTable_User(t *testing.T) {
 	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
-func TestGetTable_Admin(t *testing.T) {
+func TestGetOrder_Admin(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := createAndAddTable(nil)
+	order := createAndAddOrder(nil, nil)
 	admin := generateAdminForm()
 	form := generateLoginForm(admin)
 	_ = createAndRegisterUser(admin)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.OrderPath, order.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -97,7 +97,7 @@ func TestGetTable_Admin(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
 
-func TestGetAllTable_Admin(t *testing.T) {
+func TestGetAllOrder_Admin(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	admin := generateAdminForm()
@@ -110,7 +110,7 @@ func TestGetAllTable_Admin(t *testing.T) {
 		_ = createAndAddTable(nil)
 	}
 
-	req, _ := http.NewRequest("GET", utils.TablePath, nil)
+	req, _ := http.NewRequest("GET", utils.OrderPath, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -124,17 +124,17 @@ func TestGetAllTable_Admin(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
 
-func TestGetTable_User(t *testing.T) {
+func TestGetOrder_User(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := createAndAddTable(nil)
+	order := createAndAddOrder(nil, nil)
 	user := generateUserForm()
 	form := generateLoginForm(user)
 	_ = createAndRegisterUser(user)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.OrderPath, order.Id)
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -147,10 +147,10 @@ func TestGetTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
-func TestGetAllTable_User(t *testing.T) {
+func TestGetAllOrder_User(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	user := generateUserForm()
@@ -160,10 +160,10 @@ func TestGetAllTable_User(t *testing.T) {
 	auth := loginUserAndGenerateAuth(form)
 
 	for i := 0; i < 10; i++ {
-		_ = createAndAddTable(nil)
+		_ = createAndAddOrder(nil, nil)
 	}
 
-	req, _ := http.NewRequest("GET", utils.TablePath, nil)
+	req, _ := http.NewRequest("GET", utils.OrderPath, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth)
 
@@ -174,27 +174,27 @@ func TestGetAllTable_User(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
+	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
-func TestEditTable_Admin(t *testing.T) {
+func TestEditOrder_Admin(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	tabl := createAndAddTable(nil)
+	orde := createAndAddOrder(nil, nil)
 
-	table := generateEditTableForm()
+	order := generateEditOrderForm()
 	admin := generateAdminForm()
 	form := generateLoginForm(admin)
 	_ = createAndRegisterUser(admin)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	obj, err := json.Marshal(table)
+	obj, err := json.Marshal(order)
 	if err != nil {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", utils.TablePath, tabl.Id)
+	url := fmt.Sprintf("%v/%v", utils.OrderPath, orde.Id)
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -210,24 +210,24 @@ func TestEditTable_Admin(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
 
-func TestEditTable_User(t *testing.T) {
+func TestEditOrder_User(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	tabl := createAndAddTable(nil)
+	orde := createAndAddOrder(nil, nil)
 
-	table := generateEditTableForm()
+	order := generateEditOrderForm()
 	user := generateUserForm()
 	form := generateLoginForm(user)
 	_ = createAndRegisterUser(user)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	obj, err := json.Marshal(table)
+	obj, err := json.Marshal(order)
 	if err != nil {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("%v/%v", utils.TablePath, tabl.Id)
+	url := fmt.Sprintf("%v/%v", utils.OrderPath, orde.Id)
 
 	req, _ := http.NewRequest("PATCH", url, bytes.NewReader(obj))
 	req.Header.Set("Content-Type", "application/json")
@@ -243,17 +243,17 @@ func TestEditTable_User(t *testing.T) {
 	assert.Equal(t, http.StatusForbidden, w.Code, "Status code should be the same")
 }
 
-func TestDeleteTable_Admin(t *testing.T) {
+func TestDeleteOrder_Admin(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := createAndAddTable(nil)
+	order := createAndAddOrder(nil, nil)
 	admin := generateAdminForm()
 	form := generateLoginForm(admin)
 	_ = createAndRegisterUser(admin)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.OrderPath, order.Id)
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -269,17 +269,17 @@ func TestDeleteTable_Admin(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code, "Status code should be the same")
 }
 
-func TestDeleteTable_User(t *testing.T) {
+func TestDeleteOrder_User(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	table := createAndAddTable(nil)
+	order := createAndAddOrder(nil, nil)
 	user := generateUserForm()
 	form := generateLoginForm(user)
 	_ = createAndRegisterUser(user)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	url := fmt.Sprintf("%v/%v", utils.TablePath, table.Id)
+	url := fmt.Sprintf("%v/%v", utils.OrderPath, order.Id)
 
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")

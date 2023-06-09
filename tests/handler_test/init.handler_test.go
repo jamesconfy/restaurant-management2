@@ -35,6 +35,7 @@ var (
 	menuRepo  repo.MenuRepo
 	foodRepo  repo.FoodRepo
 	tableRepo repo.TableRepo
+	orderRepo repo.OrderRepo
 
 	//
 	router *gin.Engine
@@ -50,6 +51,7 @@ var (
 	menuSrv  service.MenuService
 	foodSrv  service.FoodService
 	tableSrv service.TableService
+	orderSrv service.OrderService
 )
 
 func init() {
@@ -129,6 +131,7 @@ func init() {
 	menuRepo = repo.NewMenuRepo(db)
 	foodRepo = repo.NewFoodRepo(db)
 	tableRepo = repo.NewTableRepo(db)
+	orderRepo = repo.NewOrderRepo(db)
 
 	// Initialize Services
 	emailSrv = service.NewEmailService("", "", "", "")
@@ -140,6 +143,7 @@ func init() {
 	menuSrv = service.NewMenuService(menuRepo)
 	foodSrv = service.NewFoodService(foodRepo, menuRepo)
 	tableSrv = service.NewTableService(tableRepo)
+	orderSrv = service.NewOrderService(orderRepo, tableRepo)
 
 	// Router
 	router = setupApp()
@@ -195,6 +199,7 @@ func setupApp() *gin.Engine {
 	routes.MenuRoute(v1, menuSrv, authSrv, cashbinEnforcer)
 	routes.FoodRoutes(v1, foodSrv, authSrv, cashbinEnforcer)
 	routes.TableRoute(v1, tableSrv, authSrv, cashbinEnforcer)
+	routes.OrderRoutes(v1, orderSrv, authSrv, cashbinEnforcer)
 	routes.HomeRoute(v1, homeSrv)
 	routes.ErrorRoute(router)
 

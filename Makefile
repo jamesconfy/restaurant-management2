@@ -1,11 +1,11 @@
 migrate_up:
-	migrate -path db/migration -database "postgresql://mac:password@localhost:5432/restaurant_management?sslmode=disable" -verbose up
+	migrate -path db/migration -database "" -verbose up
 
 migrate_down:
-	migrate -path db/migration -database "postgresql://mac:password@localhost:5432/restaurant_management?sslmode=disable" -verbose down
+	migrate -path db/migration -database "" -verbose down
 
 migrate_force:
-	migrate -path db/migration -database "postgresql://mac:password@localhost:5432/restaurant_management?sslmode=disable" force $(version)
+	migrate -path db/migration -database "" force $(version)
 
 run:	
 	go build restaurant-management-api.go && ./restaurant-management-api
