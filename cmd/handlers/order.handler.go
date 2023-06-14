@@ -160,4 +160,3 @@ func (o *orderHandler) GetAll(c *gin.Context) {
 func NewOrderHandler(orderSrv service.OrderService, casbin *casbin.Enforcer) OrderHandler {
 	return &orderHandler{orderSrv: orderSrv, casbin: casbin}
 }
-
