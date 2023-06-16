@@ -20,3 +20,14 @@ func generateOrderItem(order *models.Order, food *models.Food) *models.OrderItem
 		Quantity: rand.Intn(100) + 1,
 	}
 }
+
+func createAndAddOrderItem(order *models.Order, food *models.Food) *models.OrderItem {
+	orderItem := generateOrderItem(order, food)
+
+	orderItem, err := orderItemRepo.Add(orderItem)
+	if err != nil {
+		panic(err)
+	}
+
+	return orderItem
+}
