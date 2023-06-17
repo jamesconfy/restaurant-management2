@@ -9,6 +9,7 @@ type OrderItemRepo interface {
 	Add(item *models.OrderItem) (*models.OrderItem, error)
 	Get(orderItemId string) (*models.OrderItem, error)
 	GetAll() ([]*models.OrderItem, error)
+	Delete(orderItemId string) error
 }
 
 type orderItemRepo struct {
@@ -66,6 +67,18 @@ func (oi *orderItemRepo) Get(orderItemId string) (item *models.OrderItem, err er
 	}
 
 	return
+}
+
+// Delete implements OrderItemRepo.
+func (oi *orderItemRepo) Delete(orderItemId string) error {
+	query := `DELETE FROM orderitems WHERE id = $1`
+
+	_, err := oi.conn.Exec(query, orderItemId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewOrderItemRepo(conn *sql.DB) OrderItemRepo {
