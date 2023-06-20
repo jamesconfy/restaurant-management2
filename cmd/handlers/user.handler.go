@@ -109,7 +109,7 @@ func (u *userHandler) Login(c *gin.Context) {
 // Get User godoc
 // @Summary	Get user route
 // @Description	Get user by id
-// @Tags	Users
+// @Tags	User
 // @Accept	json
 // @Produce	json
 // @Param	userId	path	string	true	"User Id" Format(uuid)
@@ -132,7 +132,7 @@ func (u *userHandler) Get(c *gin.Context) {
 // Get User Profile godoc
 // @Summary	Get user profile route
 // @Description	Get user profile
-// @Tags	Users
+// @Tags	User
 // @Accept	json
 // @Produce	json
 // @Success	200  {object}  response.SuccessMessage{data=models.User}
@@ -154,7 +154,7 @@ func (u *userHandler) GetProfile(c *gin.Context) {
 // Get All User godoc
 // @Summary	Get all user route
 // @Description	Get all users in the system
-// @Tags	Users
+// @Tags	User
 // @Accept	json
 // @Produce	json
 // @Success	200  {object}  response.SuccessMessage{data=[]models.User}
@@ -176,7 +176,7 @@ func (u *userHandler) GetAll(c *gin.Context) {
 // Edit User godoc
 // @Summary	Edit user route
 // @Description	Edit user in the system
-// @Tags	Users
+// @Tags	User
 // @Accept	json
 // @Produce	json
 // @Param	request	body	forms.EditUser	true "Edit Details"
@@ -206,7 +206,7 @@ func (u *userHandler) Edit(c *gin.Context) {
 // Delete User godoc
 // @Summary	Delete user route
 // @Description	Delete user
-// @Tags	Users
+// @Tags	User
 // @Produce	json
 // @Success	200  {string}	string	"User deleted successfully"
 // @Failure	400  {object}  response.ErrorMessage

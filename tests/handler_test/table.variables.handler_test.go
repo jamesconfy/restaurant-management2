@@ -24,3 +24,10 @@ func createAndAddTable(table *forms.Table) *models.Table {
 
 	return tabl
 }
+
+func generateEditTableForm() *forms.EditTable {
+	return &forms.EditTable{
+		Seats:  rand.Intn(30) + 1,
+		Booked: true,
+	}
+}

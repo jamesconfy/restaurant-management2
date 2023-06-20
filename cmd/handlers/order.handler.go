@@ -24,6 +24,19 @@ type orderHandler struct {
 }
 
 // Add implements OrderHandler.
+// Add Order godoc
+// @Summary	Add order route
+// @Description	Provide details to add an order
+// @Tags	Order
+// @Accept	json
+// @Produce	json
+// @Param	request	body	forms.Order	true	"Add order form"
+// @Success	200  {object}  response.SuccessMessage{data=models.Order}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/orders [post]
+// @Security ApiKeyAuth
 func (o *orderHandler) Add(c *gin.Context) {
 	var req forms.Order
 
@@ -42,6 +55,19 @@ func (o *orderHandler) Add(c *gin.Context) {
 }
 
 // Delete implements OrderHandler.
+// Delete Order godoc
+// @Summary	Delete order route
+// @Description	Provide details to delete an order
+// @Tags	Order
+// @Accept	json
+// @Produce	json
+// @Param	orderId	path	string	true	"Order Id" Format(uuid)
+// @Success	200  {string}	string	"order deleted successfully"
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/orders/{orderId} [delete]
+// @Security ApiKeyAuth
 func (o *orderHandler) Delete(c *gin.Context) {
 	err := o.orderSrv.Delete(c.Param("orderId"))
 	if err != nil {
@@ -53,6 +79,20 @@ func (o *orderHandler) Delete(c *gin.Context) {
 }
 
 // Edit implements OrderHandler.
+// Edit Order godoc
+// @Summary	Edit order route
+// @Description	Provide details to edit an order
+// @Tags	Order
+// @Accept	json
+// @Produce	json
+// @Param	request	body	forms.EditOrder	true	"Edit order form"
+// @Param	orderId	path	string	true	"Order Id" Format(uuid)
+// @Success	200  {object}	response.SuccessMessage{data=models.Order}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/orders/{orderId} [patch]
+// @Security ApiKeyAuth
 func (o *orderHandler) Edit(c *gin.Context) {
 	var req forms.EditOrder
 
@@ -71,6 +111,19 @@ func (o *orderHandler) Edit(c *gin.Context) {
 }
 
 // Get implements OrderHandler.
+// Get Order godoc
+// @Summary	Get order route
+// @Description	Provide order id to get a particular order
+// @Tags	Order
+// @Accept	json
+// @Produce	json
+// @Param	orderId	path	string	true	"Order Id" Format(uuid)
+// @Success	200  {object}	response.SuccessMessage{data=models.Order}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/orders/{orderId} [get]
+// @Security ApiKeyAuth
 func (o *orderHandler) Get(c *gin.Context) {
 	order, err := o.orderSrv.Get(c.Param("orderId"))
 	if err != nil {
@@ -82,6 +135,18 @@ func (o *orderHandler) Get(c *gin.Context) {
 }
 
 // GetAll implements OrderHandler.
+// Get All Order godoc
+// @Summary	Get all order route
+// @Description	Get all orders in the system
+// @Tags	Order
+// @Accept	json
+// @Produce	json
+// @Success	200  {object}	response.SuccessMessage{data=[]models.Order}
+// @Failure	400  {object}  se.ServiceError
+// @Failure	404  {object}  se.ServiceError
+// @Failure	500  {object}  se.ServiceError
+// @Router	/orders [get]
+// @Security ApiKeyAuth
 func (o *orderHandler) GetAll(c *gin.Context) {
 	orders, err := o.orderSrv.GetAll()
 	if err != nil {

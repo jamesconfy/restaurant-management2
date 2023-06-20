@@ -19,13 +19,14 @@ import (
 )
 
 var (
-	db        *sql.DB
-	userRepo  repo.UserRepo
-	authRepo  repo.AuthRepo
-	tableRepo repo.TableRepo
-	foodRepo  repo.FoodRepo
-	menuRepo  repo.MenuRepo
-	orderRepo repo.OrderRepo
+	db            *sql.DB
+	userRepo      repo.UserRepo
+	authRepo      repo.AuthRepo
+	tableRepo     repo.TableRepo
+	foodRepo      repo.FoodRepo
+	menuRepo      repo.MenuRepo
+	orderRepo     repo.OrderRepo
+	orderItemRepo repo.OrderItemRepo
 )
 
 func init() {
@@ -80,6 +81,7 @@ func init() {
 	foodRepo = repo.NewFoodRepo(db)
 	menuRepo = repo.NewMenuRepo(db)
 	orderRepo = repo.NewOrderRepo(db)
+	orderItemRepo = repo.NewOrderItemRepo(db)
 }
 
 func initDBSchema(db *sql.DB) error {

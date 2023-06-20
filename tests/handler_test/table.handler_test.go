@@ -45,14 +45,14 @@ func TestAddTable_Admin(t *testing.T) {
 func TestAddTable_User(t *testing.T) {
 	w := httptest.NewRecorder()
 
-	menu := generateTableForm()
+	table := generateTableForm()
 	user := generateUserForm()
 	form := generateLoginForm(user)
 	_ = createAndRegisterUser(user)
 
 	auth := loginUserAndGenerateAuth(form)
 
-	obj, err := json.Marshal(menu)
+	obj, err := json.Marshal(table)
 	if err != nil {
 		panic(err)
 	}
@@ -182,7 +182,7 @@ func TestEditTable_Admin(t *testing.T) {
 
 	tabl := createAndAddTable(nil)
 
-	table := generateTableForm()
+	table := generateEditTableForm()
 	admin := generateAdminForm()
 	form := generateLoginForm(admin)
 	_ = createAndRegisterUser(admin)
@@ -215,7 +215,7 @@ func TestEditTable_User(t *testing.T) {
 
 	tabl := createAndAddTable(nil)
 
-	table := generateTableForm()
+	table := generateEditTableForm()
 	user := generateUserForm()
 	form := generateLoginForm(user)
 	_ = createAndRegisterUser(user)

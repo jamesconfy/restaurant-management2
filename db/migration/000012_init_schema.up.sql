@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS orderitems (
     PRIMARY KEY(id),
     FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY(food_id) REFERENCES food(id) ON DELETE CASCADE,
+    CONSTRAINT uq_order_item UNIQUE (food_id, order_id),
     CHECK (quantity > 0)
 );

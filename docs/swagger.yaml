@@ -18,6 +18,13 @@ definitions:
       name:
         type: string
     type: object
+  forms.EditOrder:
+    properties:
+      delivery_id:
+        type: integer
+      payment_id:
+        type: integer
+    type: object
   forms.EditTable:
     properties:
       booked:
@@ -53,9 +60,9 @@ definitions:
         minimum: 0
         type: number
     required:
-      - menu_id
-      - name
-      - price
+    - menu_id
+    - name
+    - price
     type: object
   forms.Login:
     properties:
@@ -65,8 +72,8 @@ definitions:
         minLength: 6
         type: string
     required:
-      - email
-      - password
+    - email
+    - password
     type: object
   forms.Menu:
     properties:
@@ -77,8 +84,16 @@ definitions:
         minLength: 1
         type: string
     required:
-      - category
-      - name
+    - category
+    - name
+    type: object
+  forms.Order:
+    properties:
+      table_id:
+        minLength: 1
+        type: string
+    required:
+    - table_id
     type: object
   forms.Table:
     properties:
@@ -86,7 +101,7 @@ definitions:
         minimum: 1
         type: integer
     required:
-      - seats
+    - seats
     type: object
   forms.User:
     properties:
@@ -108,11 +123,11 @@ definitions:
       role:
         type: string
     required:
-      - email
-      - first_name
-      - last_name
-      - password
-      - phone_number
+    - email
+    - first_name
+    - last_name
+    - password
+    - phone_number
     type: object
   models.Food:
     properties:
@@ -148,10 +163,25 @@ definitions:
     properties:
       foods:
         items:
-          $ref: "#/definitions/models.Food"
+          $ref: '#/definitions/models.Food'
         type: array
       menu:
-        $ref: "#/definitions/models.Menu"
+        $ref: '#/definitions/models.Menu'
+    type: object
+  models.Order:
+    properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      delivery_status:
+        type: string
+      id:
+        type: string
+      payment_method:
+        type: string
+      table_id:
+        type: string
     type: object
   models.Table:
     properties:
@@ -245,35 +275,35 @@ paths:
   /:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get home details
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/response.SuccessMessage"
+            $ref: '#/definitions/response.SuccessMessage'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Get home route
       tags:
-        - Home
+      - Home
   /auth/clear:
     delete:
       description: Clear user auth
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: Logged out from all other device successfully
@@ -282,64 +312,64 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Clear Login Auth route
       tags:
-        - Auth
+      - Auth
   /auth/login:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Login route
       parameters:
-        - description: Login Details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.Login"
+      - description: Login Details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Login'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.User"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Login route
       tags:
-        - Auth
+      - Auth
   /auth/logout:
     post:
       description: Logout user
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: Logged out successfully
@@ -348,147 +378,147 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Logout user route
       tags:
-        - Auth
+      - Auth
   /auth/register:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Register route
       parameters:
-        - description: Signup Details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.User"
+      - description: Signup Details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.User'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.User"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Register route
       tags:
-        - Auth
+      - Auth
   /foods:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to get all food
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    items:
-                      $ref: "#/definitions/models.Food"
-                    type: array
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Food'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Get all Food route
       tags:
-        - Food
+      - Food
     post:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to add food
       parameters:
-        - description: Food details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.Food"
+      - description: Food details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Food'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Food"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Food'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Add Food route
       tags:
-        - Food
+      - Food
   /foods/{foodId}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to delete food
       parameters:
-        - description: Food Id
-          format: uuid
-          in: path
-          name: foodId
-          required: true
-          type: string
+      - description: Food Id
+        format: uuid
+        in: path
+        name: foodId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: food deleted successfully
@@ -497,192 +527,192 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Delete Food route
       tags:
-        - Food
+      - Food
     get:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to get food
       parameters:
-        - description: Food Id
-          format: uuid
-          in: path
-          name: foodId
-          required: true
-          type: string
+      - description: Food Id
+        format: uuid
+        in: path
+        name: foodId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Food"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Food'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Get Food route
       tags:
-        - Food
+      - Food
     patch:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to edit food
       parameters:
-        - description: Food Id
-          format: uuid
-          in: path
-          name: foodId
-          required: true
-          type: string
-        - description: Food details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.EditFood"
+      - description: Food Id
+        format: uuid
+        in: path
+        name: foodId
+        required: true
+        type: string
+      - description: Food details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditFood'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Food"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Food'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Edit Food route
       tags:
-        - Food
+      - Food
   /menus:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to get all menu
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    items:
-                      $ref: "#/definitions/models.Menu"
-                    type: array
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Menu'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Get all menu route
       tags:
-        - Menu
+      - Menu
     post:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to add menu
       parameters:
-        - description: Menu details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.Menu"
+      - description: Menu details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Menu'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Menu"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Menu'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Add Menu route
       tags:
-        - Menu
+      - Menu
   /menus/{menuId}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to delete a menu
       parameters:
-        - description: Menu Id
-          format: uuid
-          in: path
-          name: menuId
-          required: true
-          type: string
+      - description: Menu Id
+        format: uuid
+        in: path
+        name: menuId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: menu deleted successfully
@@ -691,194 +721,392 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Delete menu route
       tags:
-        - Menu
+      - Menu
     get:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to get menu
       parameters:
-        - description: Menu Id
-          format: uuid
-          in: path
-          name: menuId
-          required: true
-          type: string
+      - description: Menu Id
+        format: uuid
+        in: path
+        name: menuId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.MenuFood"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.MenuFood'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       summary: Get menu route
       tags:
-        - Menu
+      - Menu
     patch:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to edit menu
       parameters:
-        - description: Menu Id
-          format: uuid
-          in: path
-          name: menuId
-          required: true
-          type: string
-        - description: Menu details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.EditMenu"
+      - description: Menu Id
+        format: uuid
+        in: path
+        name: menuId
+        required: true
+        type: string
+      - description: Menu details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditMenu'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Menu"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Menu'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Edit menu route
       tags:
-        - Menu
+      - Menu
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Get all orders in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Order'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all order route
+      tags:
+      - Order
+    post:
+      consumes:
+      - application/json
+      description: Provide details to add an order
+      parameters:
+      - description: Add order form
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Add order route
+      tags:
+      - Order
+  /orders/{orderId}:
+    delete:
+      consumes:
+      - application/json
+      description: Provide details to delete an order
+      parameters:
+      - description: Order Id
+        format: uuid
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: order deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete order route
+      tags:
+      - Order
+    get:
+      consumes:
+      - application/json
+      description: Provide order id to get a particular order
+      parameters:
+      - description: Order Id
+        format: uuid
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get order route
+      tags:
+      - Order
+    patch:
+      consumes:
+      - application/json
+      description: Provide details to edit an order
+      parameters:
+      - description: Edit order form
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditOrder'
+      - description: Order Id
+        format: uuid
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/se.ServiceError'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit order route
+      tags:
+      - Order
   /tables:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to get table
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    items:
-                      $ref: "#/definitions/models.Table"
-                    type: array
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Table'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Get all table route
       tags:
-        - Table
+      - Table
     post:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to add table
       parameters:
-        - description: Table details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.Table"
+      - description: Table details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Table'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Table"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Table'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Add table route
       tags:
-        - Table
+      - Table
   /tables/{tableId}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to delete a table
       parameters:
-        - description: Table Id
-          format: uuid
-          in: path
-          name: tableId
-          required: true
-          type: string
+      - description: Table Id
+        format: uuid
+        in: path
+        name: tableId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: table deleted successfully
@@ -887,188 +1115,188 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Delete table route
       tags:
-        - Table
+      - Table
     get:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to get table
       parameters:
-        - description: Table Id
-          format: uuid
-          in: path
-          name: tableId
-          required: true
-          type: string
+      - description: Table Id
+        format: uuid
+        in: path
+        name: tableId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Table"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Table'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Get table route
       tags:
-        - Table
+      - Table
     patch:
       consumes:
-        - application/json
+      - application/json
       description: Provide details to edit table
       parameters:
-        - description: Table Id
-          format: uuid
-          in: path
-          name: tableId
-          required: true
-          type: string
-        - description: Table details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.EditTable"
+      - description: Table Id
+        format: uuid
+        in: path
+        name: tableId
+        required: true
+        type: string
+      - description: Table details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditTable'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.Table"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Table'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Edit table route
       tags:
-        - Table
+      - Table
   /users:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get all users in the system
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    items:
-                      $ref: "#/definitions/models.User"
-                    type: array
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Get all user route
       tags:
-        - Users
+      - User
   /users/{userId}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get user by id
       parameters:
-        - description: User Id
-          format: uuid
-          in: path
-          name: userId
-          required: true
-          type: string
+      - description: User Id
+        format: uuid
+        in: path
+        name: userId
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.User"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Get user route
       tags:
-        - Users
+      - User
   /users/profile:
     delete:
       description: Delete user
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: User deleted successfully
@@ -1077,96 +1305,96 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/response.ErrorMessage"
+            $ref: '#/definitions/response.ErrorMessage'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Delete user route
       tags:
-        - Users
+      - User
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get user profile
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.User"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Get user profile route
       tags:
-        - Users
+      - User
     patch:
       consumes:
-        - application/json
+      - application/json
       description: Edit user in the system
       parameters:
-        - description: Edit Details
-          in: body
-          name: request
-          required: true
-          schema:
-            $ref: "#/definitions/forms.EditUser"
+      - description: Edit Details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/forms.EditUser'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-              - $ref: "#/definitions/response.SuccessMessage"
-              - properties:
-                  data:
-                    $ref: "#/definitions/models.User"
-                type: object
+            - $ref: '#/definitions/response.SuccessMessage'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/se.ServiceError"
+            $ref: '#/definitions/se.ServiceError'
       security:
-        - ApiKeyAuth: []
+      - ApiKeyAuth: []
       summary: Edit user route
       tags:
-        - Users
+      - User
 schemes:
-  - http
-  - https
+- http
+- https
 securityDefinitions:
   ApiKeyAuth:
     in: header
