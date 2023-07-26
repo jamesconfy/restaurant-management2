@@ -16,5 +16,9 @@ class QuickstartUser(HttpUser):
         self.client.get("/users")
 
     @task
-    def get_products(self):
-        self.client.get("/products")
+    def get_menus(self):
+        self.client.get("/menus")
+
+    @task
+    def get_foods(self):
+        self.client.get("/foods")
